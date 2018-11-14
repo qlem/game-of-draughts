@@ -25,6 +25,15 @@ class Player1Widget(QWidget):
 
         self.setStyleSheet("background: red")
 
+        print("player 1")
+        print(self.width())
+        print(self.height())
+
+    def resizeEvent(self, event):
+        print("player 1")
+        print(self.width())
+        print(self.height())
+
 
 class Player2Widget(QWidget):
     def __init__(self):
@@ -37,6 +46,15 @@ class Player2Widget(QWidget):
         self.setLayout(layout)
 
         self.setStyleSheet("background: blue")
+
+        print("player 2")
+        print(self.width())
+        print(self.height())
+
+    def resizeEvent(self, event):
+        print("player 2")
+        print(self.width())
+        print(self.height())
 
 
 class GameBoardWidget(QWidget):
@@ -51,8 +69,22 @@ class GameBoardWidget(QWidget):
 
         self.setStyleSheet("background: green")
 
+        print("game board")
+        print(self.width())
+        print(self.height())
+
+    def resizeEvent(self, event):
+        print("game board")
+        print(self.width())
+        print(self.height())
+
 
 class MainWidget(QWidget):
+    """
+        def __init__(self, parent=None):
+        super(MainWidget, self).__init__(parent)
+    """
+
     def __init__(self):
         super().__init__()
 
@@ -65,6 +97,15 @@ class MainWidget(QWidget):
         layout.addWidget(self.player1_widget, 0, 2, 1, 1)
         layout.addWidget(self.player2_widget, 1, 2, 1, 1)
         self.setLayout(layout)
+
+        print("main widget")
+        print(self.width())
+        print(self.height())
+
+    def resizeEvent(self, event):
+        print("main widget")
+        print(self.width())
+        print(self.height())
 
 
 class Window(QMainWindow):
