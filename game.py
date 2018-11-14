@@ -11,7 +11,7 @@ class CellState(Enum):
     EMPTY = 0
     BLACK = 1
     WHITE = 2
-
+    PURPLE = 3
 
 class Player1Widget(QWidget):
     def __init__(self):
