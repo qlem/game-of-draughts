@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QDockWidget, QAction, QFi
 from PyQt5.QtGui import QIcon, QImage, QPainter, QPen, QColor
 import sys
 import os
-from PyQt5.QtCore import Qt, QPoint, QRect, QRectF
+from PyQt5.QtCore import Qt, QPoint, QRect, QRectF, QSize
 from enum import Enum
 
 
@@ -51,6 +51,11 @@ class GameBoardWidget(QFrame):
 
         self.init_matrix()
 
+        self.red_piece_sheet = QImage(144, 132, QImage.Format_ARGB32_Premultiplied)
+        self.white_piece_sheet = QImage(144, 132, QImage.Format_ARGB32_Premultiplied)
+        self.red_piece_sheet.load("./res/red.png")
+        self.white_piece_sheet.load("./res/white.png")
+
     def init_matrix(self):
         for i in range(8):
             self.matrix.append([])
@@ -69,22 +74,40 @@ class GameBoardWidget(QFrame):
             for j in range(8):
                 x = j * self.CELL_SIZE
                 y = i * self.CELL_SIZE
+                target = self.get_target_rect(x, y)
                 if i % 2 == 0 and j % 2 > 0 or i % 2 > 0 and j % 2 == 0:
-                    painter.fillRect(x, y, self.CELL_SIZE, self.CELL_SIZE, Qt.black)
+                    painter.fillRect(x, y, self.CELL_SIZE, self.CELL_SIZE, Qt.darkGreen)
                 elif i % 2 == 0 and j % 2 == 0 or i % 2 > 0 and j % 2 > 0:
                     painter.fillRect(x, y, self.CELL_SIZE, self.CELL_SIZE, Qt.lightGray)
-                # TODO draw pieces here from matrix
+                if self.matrix[i][j] == Cell.RED:
+                    painter.drawImage(target, self.red_piece_sheet)
+                elif self.matrix[i][j] == Cell.WHITE:
+                    painter.drawImage(target, self.white_piece_sheet)
 
         pen = QPen(Qt.black, 6, Qt.SolidLine, Qt.FlatCap, Qt.MiterJoin)
         painter.setPen(pen)
-        painter.drawLine(0, 0, self.BOARD_SIZE, 0)
-        painter.drawLine(self.BOARD_SIZE, 0, self.BOARD_SIZE, self.BOARD_SIZE)
-        painter.drawLine(self.BOARD_SIZE, self.BOARD_SIZE, 0, self.BOARD_SIZE)
-        painter.drawLine(0, 0, 0, self.BOARD_SIZE)
+        borders = QRect(0, 0, self.BOARD_SIZE, self.BOARD_SIZE)
+        painter.drawRect(borders)
 
     def paintEvent(self, event):
         print("paint event")
         self.draw_board()
+
+    def get_target_rect(self, x, y):
+        factor = 132 / 144
+        scaled_w = self.CELL_SIZE * 0.7
+        scaled_h = scaled_w * factor
+        x = x + self.CELL_SIZE / 2 - scaled_w / 2
+        y = y + self.CELL_SIZE / 2 - scaled_h / 2
+        QRectF(x, y, scaled_w, scaled_h)
+        return QRectF(x, y, scaled_w, scaled_h)
+
+    def rescale_sheet(self):
+        factor = 132 / 144
+        scaled_w = self.CELL_SIZE * 0.7
+        scaled_h = scaled_w * factor
+        self.red_piece_sheet = self.red_piece_sheet.scaled(scaled_w, scaled_h)
+        self.white_piece_sheet = self.white_piece_sheet.scaled(scaled_w, scaled_h)
 
     def resizeEvent(self, event):
         print("resize event")
@@ -97,6 +120,8 @@ class GameBoardWidget(QFrame):
             self.resize(self.height(), self.height())
         self.BOARD_SIZE = size
         self.CELL_SIZE = size / 8
+
+        self.rescale_sheet()
 
 
 class MainWidget(QWidget):
