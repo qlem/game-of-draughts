@@ -83,6 +83,7 @@ class GameBoardWidget(QFrame):
                     painter.drawImage(target, self.red_piece_sheet)
                 elif self.matrix[i][j] == Cell.WHITE:
                     painter.drawImage(target, self.white_piece_sheet)
+                # TODO draw king here
 
         pen = QPen(Qt.black, 6, Qt.SolidLine, Qt.FlatCap, Qt.MiterJoin)
         painter.setPen(pen)
@@ -99,7 +100,6 @@ class GameBoardWidget(QFrame):
         scaled_h = scaled_w * factor
         x = x + self.CELL_SIZE / 2 - scaled_w / 2
         y = y + self.CELL_SIZE / 2 - scaled_h / 2
-        QRectF(x, y, scaled_w, scaled_h)
         return QRectF(x, y, scaled_w, scaled_h)
 
     def rescale_sheet(self):
