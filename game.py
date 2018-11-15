@@ -7,10 +7,12 @@ from PyQt5.QtCore import Qt, QPoint, QRect, QRectF
 from enum import Enum
 
 
-class CellState(Enum):
+class Cell(Enum):
     EMPTY = 0
-    BLACK = 1
+    RED = 1
     WHITE = 2
+    RED_KING = 3
+    WHITE_KING = 4
 
 
 class Player1Widget(QWidget):
@@ -45,9 +47,33 @@ class GameBoardWidget(QFrame):
 
         self.BOARD_SIZE = 0
         self.CELL_SIZE = 0
+        self.matrix = []
+
+        self.init_matrix()
+
+    def init_matrix(self):
+        for i in range(8):
+            self.matrix.append([])
+            for j in range(8):
+                self.matrix[i].append(Cell.EMPTY)
+                if i % 2 == 0 and j % 2 > 0 or i % 2 > 0 and j % 2 == 0:
+                    if i < 3:
+                        self.matrix[i][j] = Cell.RED
+                    elif i > 4:
+                        self.matrix[i][j] = Cell.WHITE
 
     def draw_board(self):
         painter = QPainter(self)
+
+        for i in range(8):
+            for j in range(8):
+                x = j * self.CELL_SIZE
+                y = i * self.CELL_SIZE
+                if i % 2 == 0 and j % 2 > 0 or i % 2 > 0 and j % 2 == 0:
+                    painter.fillRect(x, y, self.CELL_SIZE, self.CELL_SIZE, Qt.black)
+                elif i % 2 == 0 and j % 2 == 0 or i % 2 > 0 and j % 2 > 0:
+                    painter.fillRect(x, y, self.CELL_SIZE, self.CELL_SIZE, Qt.lightGray)
+                # TODO draw pieces here from matrix
 
         pen = QPen(Qt.black, 6, Qt.SolidLine, Qt.FlatCap, Qt.MiterJoin)
         painter.setPen(pen)
@@ -55,15 +81,6 @@ class GameBoardWidget(QFrame):
         painter.drawLine(self.BOARD_SIZE, 0, self.BOARD_SIZE, self.BOARD_SIZE)
         painter.drawLine(self.BOARD_SIZE, self.BOARD_SIZE, 0, self.BOARD_SIZE)
         painter.drawLine(0, 0, 0, self.BOARD_SIZE)
-
-        for i in range(8):
-            for j in range(8):
-                x = j * self.CELL_SIZE
-                y = i * self.CELL_SIZE
-                if i % 2 == 0 and j % 2 > 0:
-                    painter.fillRect(x, y, self.CELL_SIZE, self.CELL_SIZE, Qt.black)
-                elif i % 2 > 0 and j % 2 == 0:
-                    painter.fillRect(x, y, self.CELL_SIZE, self.CELL_SIZE, Qt.black)
 
     def paintEvent(self, event):
         print("paint event")
