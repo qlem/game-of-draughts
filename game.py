@@ -67,6 +67,14 @@ class GameBoardWidget(QFrame):
                     elif i > 4:
                         self.matrix[i][j] = Cell.WHITE
 
+    def get_target_rect(self, x, y):
+        factor = 132 / 144
+        scaled_w = self.CELL_SIZE * 0.7
+        scaled_h = scaled_w * factor
+        x = x + self.CELL_SIZE / 2 - scaled_w / 2
+        y = y + self.CELL_SIZE / 2 - scaled_h / 2
+        return QRectF(x, y, scaled_w, scaled_h)
+
     def draw_board(self):
         painter = QPainter(self)
 
@@ -93,14 +101,6 @@ class GameBoardWidget(QFrame):
     def paintEvent(self, event):
         print("paint event")
         self.draw_board()
-
-    def get_target_rect(self, x, y):
-        factor = 132 / 144
-        scaled_w = self.CELL_SIZE * 0.7
-        scaled_h = scaled_w * factor
-        x = x + self.CELL_SIZE / 2 - scaled_w / 2
-        y = y + self.CELL_SIZE / 2 - scaled_h / 2
-        return QRectF(x, y, scaled_w, scaled_h)
 
     def rescale_sheet(self):
         factor = 132 / 144
