@@ -2,12 +2,16 @@ import sys
 import os
 from enum import Enum
 
-
+"""
+Defines which turn it is
+"""
 class PlayerTurn(Enum):
     BLACK = 0
     WHITE = 1
 
-
+"""
+Defines a cell 
+"""
 class CellState(Enum):
     EMPTY = 0
     BLACK_MAN = 1
@@ -15,7 +19,9 @@ class CellState(Enum):
     WHITE_MAN = 3
     WHITE_KING = 4
 
-
+"""
+Defines the game logic
+"""
 class Game:
     def __init__(self, x, y):
         self.x = x
@@ -31,7 +37,7 @@ class Game:
 
         self.InitializeBoard()
 
-        self.RunTest()
+        #self.RunTest()
 
     def RunTest(self):
         self.PrintCells()
@@ -136,6 +142,10 @@ class Game:
         self.Cells[self.SelectedPawn["y"]][self.SelectedPawn["x"]] = CellState.EMPTY
         print("Move made at " + str(x) + ";" + str(y))
 
+    """
+    Retrieves possible moves from the selected man
+    """
+
     def GetManMoves(self):
         # Verifies 1 block away
         if (self.SelectedPawn["y"] + 1 < self.y and self.SelectedPawn["x"] + 1 < self.x) \
@@ -183,6 +193,10 @@ class Game:
                      or self.Cells[self.SelectedPawn["y"] - 1][self.SelectedPawn["x"] - 1] == CellState.BLACK_KING) \
                 and self.PlayerTurn == PlayerTurn.WHITE:
             self.PossibleMoves.append((self.SelectedPawn["x"] - 2, self.SelectedPawn["y"] - 2))
+
+    """
+    Retrieves possible moves from the selected king
+    """
 
     def GetKingMoves(self):
         # Verifies 1 block away
