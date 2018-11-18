@@ -219,9 +219,9 @@ class MainWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        self.game = VarsGame()
+        self.v_game = VarsGame()
 
-        self.game_board_widget = GameBoardWidget(self, self.game)
+        self.game_board_widget = GameBoardWidget(self, self.v_game)
         self.player1_widget = Player1Widget(self)
         self.player2_widget = Player2Widget(self)
 
@@ -232,8 +232,8 @@ class MainWidget(QWidget):
         self.setLayout(layout)
 
     def update_ui(self):
-        self.player1_widget.update_ui(self.game)
-        self.player2_widget.update_ui(self.game)
+        self.player1_widget.update_ui(self.v_game)
+        self.player2_widget.update_ui(self.v_game)
 
 
 class Window(QMainWindow):
@@ -259,10 +259,12 @@ class Window(QMainWindow):
         game_menu.addAction(quit_action)
         quit_action.triggered.connect(lambda: self.close())
 
-    @staticmethod
-    def restart_game():
-        # TODO
-        print("TODO")
+    def restart_game(self):
+        # TODO need to be test
+        self.central_widget.game_board_widget.init_matrix()
+        self.central_widget.game_board_widget.update()
+        self.central_widget.v_game = VarsGame()
+        self.central_widget.update_ui()
 
 
 if __name__ == '__main__':
