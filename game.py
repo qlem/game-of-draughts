@@ -144,6 +144,24 @@ class Window(QMainWindow):
         self.setCentralWidget(self.central_widget)
         # self.central_widget.show()
 
+        menu = self.menuBar()
+        game_menu = menu.addMenu("Game")
+
+        restart_action = QAction(QIcon("./res/restore.png"), "Restart", self)
+        restart_action.setShortcut("Ctrl+R")
+        game_menu.addAction(restart_action)
+        restart_action.triggered.connect(self.restart_game)
+
+        quit_action = QAction(QIcon("./res/exit.png"), "Quit", self)
+        quit_action.setShortcut("Ctrl+Q")
+        game_menu.addAction(quit_action)
+        quit_action.triggered.connect(lambda: self.close())
+
+    @staticmethod
+    def restart_game():
+        # TODO
+        print("TODO")
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
