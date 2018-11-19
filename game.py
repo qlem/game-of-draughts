@@ -25,6 +25,12 @@ class Player(Enum):
     PLAYER_2 = 1
 
 
+class CellCoordinates:
+    def __init__(self, row=0, col=0):
+        self.row = row
+        self.col = col
+
+
 class VarsGame:
     def __init__(self):
         self.state = GameState.RUNNING
@@ -210,9 +216,11 @@ class GameBoardWidget(QFrame):
         self.CELL_SIZE = size / 8
 
     def mousePressEvent(self, event):
-        # TODO test for update ui
-        self.v_game.score_pl1 = 42
-        self.parentWidget().update_ui()
+        if event.button() == Qt.LeftButton:
+            col = int(event.x() / self.CELL_SIZE)
+            row = int(event.y() / self.CELL_SIZE)
+            print(row, col, self.matrix[row][col])
+        # TODO logic here / update self.v_game and call self.parentWidget().update_ui() for update ui
 
 
 class MainWidget(QWidget):
