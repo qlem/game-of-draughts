@@ -203,7 +203,7 @@ class GameBoardWidget(QFrame):
         if self.game.GameOver:
             if self.game.ScoreBlack > self.game.ScoreWhite:
                 painter.drawText(self.rect(), Qt.AlignCenter, "RED WIN")
-            elif self.game.ScoreWhite < self.game.ScoreBlack:
+            elif self.game.ScoreWhite > self.game.ScoreBlack:
                 painter.drawText(self.rect(), Qt.AlignCenter, "WHITE WIN")
             else:
                 painter.drawText(self.rect(), Qt.AlignCenter, "DRAW")
