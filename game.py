@@ -1,51 +1,14 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, QWidget, QLabel, \
     QVBoxLayout, QGridLayout, QMessageBox, QFrame
 from PyQt5.QtGui import QIcon, QImage, QPainter, QPen
+from PyQt5.QtCore import Qt, QPoint, QRect, QRectF, QSize
 import sys
 import os
-from PyQt5.QtCore import Qt, QPoint, QRect, QRectF, QSize
-from enum import Enum
 import logic
 
 
-class GameState(Enum):
-    RUNNING = 0
-    FINISHED = 1
-
-
-class Cell(Enum):
-    EMPTY = 0
-    RED = 1
-    WHITE = 2
-    RED_KING = 3
-    WHITE_KING = 4
-
-
-class Player(Enum):
-    PLAYER_1 = 0
-    PLAYER_2 = 1
-
-
-class CellCoordinates:
-    def __init__(self, row=0, col=0):
-        self.row = row
-        self.col = col
-
-
-class VarsGame:
-    def __init__(self):
-        self.state = GameState.RUNNING
-        self.score_pl1 = 0
-        self.score_pl2 = 0
-        self.remaining_pl1 = 12
-        self.remaining_pl2 = 12
-        self.jumps_pl1 = 0
-        self.jumps_pl2 = 0
-        self.turn = Player.PLAYER_1
-
-
 class PieceIndicator(QFrame):
-    def __init__(self, parent=None, player=Player.PLAYER_1):
+    def __init__(self, parent=None, player=logic.PlayerTurn.BLACK):
         super().__init__(parent)
 
         self.player = player
@@ -58,7 +21,7 @@ class PieceIndicator(QFrame):
     def paintEvent(self, event):
         painter = QPainter(self)
         target = QRect(15, 15, 70, 70)
-        if self.player == Player.PLAYER_1:
+        if self.player == logic.PlayerTurn.BLACK:
             painter.drawImage(target, self.sprite_sheet, QRect(0, 0, 174, 154))
         else:
             painter.drawImage(target, self.sprite_sheet, QRect(348, 0, 174, 154))
@@ -72,12 +35,10 @@ class Player1Widget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        piece_indicator = PieceIndicator(self, Player.PLAYER_1)
+        piece_indicator = PieceIndicator(self, logic.PlayerTurn.BLACK)
         self.turn_label = QLabel("Your turn")
         score_label = QLabel("score:")
         self.score_value = QLabel("0")
-        remaining_label = QLabel("remaining:")
-        self.remaining_value = QLabel("12")
         jumps_label = QLabel("jumps:")
         self.jumps_value = QLabel("0")
 
@@ -86,34 +47,25 @@ class Player1Widget(QWidget):
         layout.addWidget(self.turn_label, 0, 1, 1, 1)
         layout.addWidget(score_label, 1, 0, 1, 1)
         layout.addWidget(self.score_value, 1, 1, 1, 1)
-        layout.addWidget(remaining_label, 2, 0, 1, 1)
-        layout.addWidget(self.remaining_value, 2, 1, 1, 1)
-        layout.addWidget(jumps_label, 3, 0, 1, 1)
-        layout.addWidget(self.jumps_value, 3, 1, 1, 1)
+        layout.addWidget(jumps_label, 2, 0, 1, 1)
+        layout.addWidget(self.jumps_value, 2, 1, 1, 1)
         self.setLayout(layout)
 
         self.setFixedSize(self.minimumSizeHint())
 
-    def update_ui(self, vars_game):
-        if vars_game.turn == Player.PLAYER_1:
-            self.turn_label.setText("Your turn")
-        else:
-            self.turn_label.setText("")
-        self.score_value.setText(str(vars_game.score_pl1))
-        self.remaining_value.setText(str(vars_game.remaining_pl1))
-        self.jumps_value.setText(str(vars_game.jumps_pl1))
+    def update_ui(self):
+        # TODO
+        return
 
 
 class Player2Widget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        piece_indicator = PieceIndicator(self, Player.PLAYER_2)
+        piece_indicator = PieceIndicator(self, logic.PlayerTurn.WHITE)
         self.turn_label = QLabel()
         score_label = QLabel("score:")
         self.score_value = QLabel("0")
-        remaining_label = QLabel("remaining:")
-        self.remaining_value = QLabel("12")
         jumps_label = QLabel("jumps:")
         self.jumps_value = QLabel("0")
 
@@ -122,43 +74,32 @@ class Player2Widget(QWidget):
         layout.addWidget(self.turn_label, 0, 1, 1, 1)
         layout.addWidget(score_label, 1, 0, 1, 1)
         layout.addWidget(self.score_value, 1, 1, 1, 1)
-        layout.addWidget(remaining_label, 2, 0, 1, 1)
-        layout.addWidget(self.remaining_value, 2, 1, 1, 1)
-        layout.addWidget(jumps_label, 3, 0, 1, 1)
-        layout.addWidget(self.jumps_value, 3, 1, 1, 1)
+        layout.addWidget(jumps_label, 2, 0, 1, 1)
+        layout.addWidget(self.jumps_value, 2, 1, 1, 1)
         self.setLayout(layout)
 
         self.setFixedSize(self.minimumSizeHint())
 
-    def update_ui(self, vars_game):
-        if vars_game.turn == Player.PLAYER_2:
-            self.turn_label.setText("Your turn")
-        else:
-            self.turn_label.setText("")
-        self.score_value.setText(str(vars_game.score_pl2))
-        self.remaining_value.setText(str(vars_game.remaining_pl2))
-        self.jumps_value.setText(str(vars_game.jumps_pl2))
+    def update_ui(self):
+        # TODO
+        return
 
 
 class GameBoardWidget(QFrame):
-    def __init__(self, parent=None, v_game=None):
+    def __init__(self, parent=None):
         super().__init__(parent)
-
-        self.v_game = v_game
 
         self.game = logic.Game(8, 8)
 
         self.BOARD_SIZE = 0
         self.CELL_SIZE = 0
-        # self.matrix = []
 
         self.setMinimumSize(600, 600)
-
-        # self.init_matrix()
 
         self.sprite_sheet = QImage(696, 154, QImage.Format_ARGB32_Premultiplied)
         self.sprite_sheet.load("./res/sprite_sheet.png")
 
+    """
     def init_matrix(self):
         for i in range(8):
             self.matrix.append([])
@@ -169,6 +110,7 @@ class GameBoardWidget(QFrame):
                         self.matrix[i][j] = Cell.RED
                     elif i > 4:
                         self.matrix[i][j] = Cell.WHITE
+    """
 
     def get_targeted_rect(self, x, y):
         factor = 132 / 144
@@ -224,16 +166,14 @@ class GameBoardWidget(QFrame):
             row = int(event.y() / self.CELL_SIZE)
             self.game.ValidClick(col, row)
             self.update()
-        # TODO logic here / update self.v_game and call self.parentWidget().update_ui() for update ui
+        # TODO update ui
 
 
 class MainWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        self.v_game = VarsGame()
-
-        self.game_board_widget = GameBoardWidget(self, self.v_game)
+        self.game_board_widget = GameBoardWidget(self)
         self.player1_widget = Player1Widget(self)
         self.player2_widget = Player2Widget(self)
 
@@ -242,10 +182,6 @@ class MainWidget(QWidget):
         layout.addWidget(self.player1_widget, 0, 2, 1, 1)
         layout.addWidget(self.player2_widget, 1, 2, 1, 1)
         self.setLayout(layout)
-
-    def update_ui(self):
-        self.player1_widget.update_ui(self.v_game)
-        self.player2_widget.update_ui(self.v_game)
 
 
 class Window(QMainWindow):
@@ -272,10 +208,7 @@ class Window(QMainWindow):
         quit_action.triggered.connect(lambda: self.close())
 
     def restart_game(self):
-        # TODO need to be test
-        self.central_widget.game_board_widget.init_matrix()
-        self.central_widget.game_board_widget.update()
-        self.central_widget.v_game = VarsGame()
+        # TODO
         self.central_widget.update_ui()
 
 
