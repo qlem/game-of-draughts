@@ -5,6 +5,7 @@ import sys
 import os
 from PyQt5.QtCore import Qt, QPoint, QRect, QRectF, QSize
 from enum import Enum
+import logic
 
 
 class GameState(Enum):
@@ -145,13 +146,15 @@ class GameBoardWidget(QFrame):
 
         self.v_game = v_game
 
+        self.game = logic.Game(8, 8)
+
         self.BOARD_SIZE = 0
         self.CELL_SIZE = 0
-        self.matrix = []
+        # self.matrix = []
 
         self.setMinimumSize(600, 600)
 
-        self.init_matrix()
+        # self.init_matrix()
 
         self.sprite_sheet = QImage(696, 154, QImage.Format_ARGB32_Premultiplied)
         self.sprite_sheet.load("./res/sprite_sheet.png")
@@ -187,13 +190,13 @@ class GameBoardWidget(QFrame):
                     painter.fillRect(x, y, self.CELL_SIZE, self.CELL_SIZE, Qt.darkGreen)
                 elif i % 2 == 0 and j % 2 == 0 or i % 2 > 0 and j % 2 > 0:
                     painter.fillRect(x, y, self.CELL_SIZE, self.CELL_SIZE, Qt.lightGray)
-                if self.matrix[i][j] == Cell.RED:
+                if self.game.Cells[i][j] == logic.CellState.BLACK_MAN:
                     painter.drawImage(target, self.sprite_sheet, QRectF(0, 0, 174, 154))
-                elif self.matrix[i][j] == Cell.WHITE:
+                elif self.game.Cells[i][j] == logic.CellState.WHITE_MAN:
                     painter.drawImage(target, self.sprite_sheet, QRectF(348, 0, 174, 154))
-                elif self.matrix[i][j] == Cell.RED_KING:
+                elif self.game.Cells[i][j] == logic.CellState.BLACK_KING:
                     painter.drawImage(target, self.sprite_sheet, QRectF(174, 0, 174, 154))
-                elif self.matrix[i][j] == Cell.WHITE_KING:
+                elif self.game.Cells[i][j] == logic.CellState.WHITE_KING:
                     painter.drawImage(target, self.sprite_sheet, QRectF(522, 0, 174, 154))
 
         pen = QPen(Qt.black, 6, Qt.SolidLine, Qt.FlatCap, Qt.MiterJoin)
@@ -219,7 +222,8 @@ class GameBoardWidget(QFrame):
         if event.button() == Qt.LeftButton:
             col = int(event.x() / self.CELL_SIZE)
             row = int(event.y() / self.CELL_SIZE)
-            print(row, col, self.matrix[row][col])
+            self.game.ValidClick(col, row)
+            self.update()
         # TODO logic here / update self.v_game and call self.parentWidget().update_ui() for update ui
 
 
