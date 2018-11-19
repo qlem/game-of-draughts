@@ -21,6 +21,7 @@ class CellState(Enum):
 
 """
 Defines the game logic
+Initialize the game class and call ValidClick(x,y)
 """
 class Game:
     def __init__(self, x, y):
