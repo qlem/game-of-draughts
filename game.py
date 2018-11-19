@@ -113,7 +113,7 @@ class GameBoardWidget(QFrame):
     """
 
     def get_targeted_rect(self, x, y):
-        factor = 132 / 144
+        factor = 154 / 174
         scaled_w = self.CELL_SIZE * 0.7
         scaled_h = scaled_w * factor
         x = x + self.CELL_SIZE / 2 - scaled_w / 2
@@ -134,10 +134,10 @@ class GameBoardWidget(QFrame):
                     painter.fillRect(x, y, self.CELL_SIZE, self.CELL_SIZE, Qt.lightGray)
                 if self.game.Cells[i][j] == logic.CellState.BLACK_MAN:
                     painter.drawImage(target, self.sprite_sheet, QRectF(0, 0, 174, 154))
-                elif self.game.Cells[i][j] == logic.CellState.WHITE_MAN:
-                    painter.drawImage(target, self.sprite_sheet, QRectF(348, 0, 174, 154))
                 elif self.game.Cells[i][j] == logic.CellState.BLACK_KING:
                     painter.drawImage(target, self.sprite_sheet, QRectF(174, 0, 174, 154))
+                elif self.game.Cells[i][j] == logic.CellState.WHITE_MAN:
+                    painter.drawImage(target, self.sprite_sheet, QRectF(348, 0, 174, 154))
                 elif self.game.Cells[i][j] == logic.CellState.WHITE_KING:
                     painter.drawImage(target, self.sprite_sheet, QRectF(522, 0, 174, 154))
 
@@ -145,6 +145,27 @@ class GameBoardWidget(QFrame):
         painter.setPen(pen)
         borders = QRect(0, 0, self.BOARD_SIZE, self.BOARD_SIZE)
         painter.drawRect(borders)
+
+        if self.game.Selected:
+            row = self.game.SelectedPawn.get("y")
+            col = self.game.SelectedPawn.get("x")
+            x = col * self.CELL_SIZE
+            y = row * self.CELL_SIZE
+            pen.setColor(Qt.yellow)
+            painter.setPen(pen)
+            borders.setRect(x, y, self.CELL_SIZE, self.CELL_SIZE)
+            painter.drawRect(borders)
+
+            for coordinates in self.game.PossibleMoves:
+                target = self.get_targeted_rect(coordinates[0] * self.CELL_SIZE, coordinates[1] * self.CELL_SIZE)
+                if self.game.Cells[row][col] == logic.CellState.BLACK_MAN:
+                    painter.drawImage(target, self.sprite_sheet, QRectF(0, 154, 174, 154))
+                elif self.game.Cells[row][col] == logic.CellState.BLACK_KING:
+                    painter.drawImage(target, self.sprite_sheet, QRectF(174, 154, 174, 154))
+                elif self.game.Cells[row][col] == logic.CellState.WHITE_MAN:
+                    painter.drawImage(target, self.sprite_sheet, QRectF(348, 154, 174, 154))
+                elif self.game.Cells[row][col] == logic.CellState.WHITE_KING:
+                    painter.drawImage(target, self.sprite_sheet, QRectF(522, 154, 174, 154))
 
     def paintEvent(self, event):
         self.draw_board()
