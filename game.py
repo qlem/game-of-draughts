@@ -18,13 +18,22 @@ class PieceIndicator(QFrame):
         self.sprite_sheet = QImage(696, 154, QImage.Format_ARGB32_Premultiplied)
         self.sprite_sheet.load("./res/sprite_sheet.png")
 
+    @staticmethod
+    def get_targeted_rect(x, y):
+        factor = 154 / 174
+        scaled_w = 100 * 0.7
+        scaled_h = scaled_w * factor
+        x = x + 50 - scaled_w / 2
+        y = y + 50 - scaled_h / 2
+        return QRectF(x, y, scaled_w, scaled_h)
+
     def paintEvent(self, event):
         painter = QPainter(self)
-        target = QRect(15, 15, 70, 70)
+        target = self.get_targeted_rect(0, 0)
         if self.player == logic.PlayerTurn.BLACK:
-            painter.drawImage(target, self.sprite_sheet, QRect(0, 0, 174, 154))
+            painter.drawImage(target, self.sprite_sheet, QRectF(0, 0, 174, 154))
         else:
-            painter.drawImage(target, self.sprite_sheet, QRect(348, 0, 174, 154))
+            painter.drawImage(target, self.sprite_sheet, QRectF(348, 0, 174, 154))
         pen = QPen(Qt.black, 6, Qt.SolidLine, Qt.FlatCap, Qt.MiterJoin)
         painter.setPen(pen)
         borders = QRect(0, 0, 100, 100)
@@ -36,22 +45,20 @@ class Player1Widget(QWidget):
         super().__init__(parent)
 
         piece_indicator = PieceIndicator(self, logic.PlayerTurn.BLACK)
-        self.turn_label = QLabel("Your turn")
         score_label = QLabel("score:")
         self.score_value = QLabel("0")
         jumps_label = QLabel("jumps:")
         self.jumps_value = QLabel("0")
+        self.turn_label = QLabel("Your turn")
 
         layout = QGridLayout()
-        layout.addWidget(piece_indicator, 0, 0, 1, 1)
-        layout.addWidget(self.turn_label, 0, 1, 1, 1)
+        layout.addWidget(piece_indicator, 0, 0, 1, 2)
         layout.addWidget(score_label, 1, 0, 1, 1)
         layout.addWidget(self.score_value, 1, 1, 1, 1)
         layout.addWidget(jumps_label, 2, 0, 1, 1)
         layout.addWidget(self.jumps_value, 2, 1, 1, 1)
+        layout.addWidget(self.turn_label, 3, 0, 1, 2)
         self.setLayout(layout)
-
-        self.setFixedSize(self.minimumSizeHint())
 
     def update_ui(self):
         # TODO
@@ -63,22 +70,20 @@ class Player2Widget(QWidget):
         super().__init__(parent)
 
         piece_indicator = PieceIndicator(self, logic.PlayerTurn.WHITE)
-        self.turn_label = QLabel()
         score_label = QLabel("score:")
         self.score_value = QLabel("0")
         jumps_label = QLabel("jumps:")
         self.jumps_value = QLabel("0")
+        self.turn_label = QLabel()
 
         layout = QGridLayout()
-        layout.addWidget(piece_indicator, 0, 0, 1, 1)
-        layout.addWidget(self.turn_label, 0, 1, 1, 1)
+        layout.addWidget(piece_indicator, 0, 0, 1, 2)
         layout.addWidget(score_label, 1, 0, 1, 1)
         layout.addWidget(self.score_value, 1, 1, 1, 1)
         layout.addWidget(jumps_label, 2, 0, 1, 1)
         layout.addWidget(self.jumps_value, 2, 1, 1, 1)
+        layout.addWidget(self.turn_label, 3, 0, 1, 2)
         self.setLayout(layout)
-
-        self.setFixedSize(self.minimumSizeHint())
 
     def update_ui(self):
         # TODO
@@ -199,9 +204,9 @@ class MainWidget(QWidget):
         self.player2_widget = Player2Widget(self)
 
         layout = QGridLayout()
-        layout.addWidget(self.game_board_widget, 0, 0, 2, 2)
-        layout.addWidget(self.player1_widget, 0, 2, 1, 1)
-        layout.addWidget(self.player2_widget, 1, 2, 1, 1)
+        layout.addWidget(self.game_board_widget, 0, 0, 2, 1)
+        layout.addWidget(self.player1_widget, 0, 1, 1, 1, Qt.AlignTop)
+        layout.addWidget(self.player2_widget, 1, 1, 1, 1, Qt.AlignTop)
         self.setLayout(layout)
 
 
