@@ -1,6 +1,6 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QDockWidget, QAction, QFileDialog, QWidget, QLabel, \
-    QPushButton, QColorDialog, QVBoxLayout, QGridLayout, QRadioButton, QButtonGroup, QSlider, QMessageBox, QFrame
-from PyQt5.QtGui import QIcon, QImage, QPainter, QPen, QColor
+from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, QWidget, QLabel, \
+    QVBoxLayout, QGridLayout, QMessageBox, QFrame
+from PyQt5.QtGui import QIcon, QImage, QPainter, QPen
 import sys
 import os
 from PyQt5.QtCore import Qt, QPoint, QRect, QRectF, QSize
