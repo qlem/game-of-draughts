@@ -1,10 +1,17 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, QWidget, QLabel, \
-    QVBoxLayout, QGridLayout, QMessageBox, QFrame
+from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, QWidget, QLabel, QGridLayout, QFrame
 from PyQt5.QtGui import QIcon, QImage, QPainter, QPen
-from PyQt5.QtCore import Qt, QPoint, QRect, QRectF, QSize
+from PyQt5.QtCore import Qt, QRect, QRectF
 import sys
 import os
 import logic
+
+
+class VarsGame:
+    def __init__(self, turn=logic.PlayerTurn.BLACK, score_red_player=0, score_white_player=0, game_over=False):
+        self.turn = turn
+        self.score_red_player = score_red_player
+        self.score_white_player = score_white_player
+        self.game_over = game_over
 
 
 class PieceIndicator(QFrame):
@@ -40,7 +47,7 @@ class PieceIndicator(QFrame):
         painter.drawRect(borders)
 
 
-class Player1Widget(QWidget):
+class RedPlayerWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
@@ -61,12 +68,21 @@ class Player1Widget(QWidget):
         layout.setAlignment(Qt.AlignLeft)
         self.setLayout(layout)
 
-    def update_ui(self):
-        # TODO
-        return
+    def update_ui(self, v_game):
+        self.score_value.setText(str(v_game.score_red_player))
+        if v_game.game_over:
+            if v_game.score_red_player > v_game.score_white_player:
+                self.turn_label.setText("Winner")
+            else:
+                self.turn_label.setText("")
+            return
+        if v_game.turn == logic.PlayerTurn.BLACK:
+            self.turn_label.setText("Your turn")
+        else:
+            self.turn_label.setText("")
 
 
-class Player2Widget(QWidget):
+class WhitePlayerWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
@@ -87,9 +103,18 @@ class Player2Widget(QWidget):
         layout.setAlignment(Qt.AlignLeft)
         self.setLayout(layout)
 
-    def update_ui(self):
-        # TODO
-        return
+    def update_ui(self, v_game):
+        self.score_value.setText(str(v_game.score_white_player))
+        if v_game.game_over:
+            if v_game.score_white_player > v_game.score_red_player:
+                self.turn_label.setText("Winner")
+            else:
+                self.turn_label.setText("")
+            return
+        if v_game.turn == logic.PlayerTurn.WHITE:
+            self.turn_label.setText("Your turn")
+        else:
+            self.turn_label.setText("")
 
 
 class GameBoardWidget(QFrame):
@@ -174,6 +199,15 @@ class GameBoardWidget(QFrame):
                 elif self.game.Cells[row][col] == logic.CellState.WHITE_KING:
                     painter.drawImage(target, self.sprite_sheet, QRectF(522, 154, 174, 154))
 
+        # TODO update here
+        if self.game.GameOver:
+            if self.game.ScoreBlack > self.game.ScoreWhite:
+                painter.drawText(self.rect(), Qt.AlignCenter, "RED WIN")
+            elif self.game.ScoreWhite < self.game.ScoreBlack:
+                painter.drawText(self.rect(), Qt.AlignCenter, "WHITE WIN")
+            else:
+                painter.drawText(self.rect(), Qt.AlignCenter, "DRAW")
+
     def paintEvent(self, event):
         self.draw_board()
 
@@ -194,22 +228,33 @@ class GameBoardWidget(QFrame):
             row = int(event.y() / self.CELL_SIZE)
             self.game.ValidClick(col, row)
             self.update()
-        # TODO update ui
+        self.parentWidget().update_ui(self.game.PlayerTurn, self.game.ScoreBlack, self.game.ScoreWhite,
+                                      self.game.GameOver)
 
 
 class MainWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
+        self.v_game = VarsGame()
+
         self.game_board_widget = GameBoardWidget(self)
-        self.player1_widget = Player1Widget(self)
-        self.player2_widget = Player2Widget(self)
+        self.red_player_widget = RedPlayerWidget(self)
+        self.white_player_widget = WhitePlayerWidget(self)
 
         layout = QGridLayout()
         layout.addWidget(self.game_board_widget, 0, 0, 2, 1)
-        layout.addWidget(self.player1_widget, 0, 1, 1, 1, Qt.AlignTop)
-        layout.addWidget(self.player2_widget, 1, 1, 1, 1, Qt.AlignTop)
+        layout.addWidget(self.red_player_widget, 0, 1, 1, 1, Qt.AlignTop)
+        layout.addWidget(self.white_player_widget, 1, 1, 1, 1, Qt.AlignTop)
         self.setLayout(layout)
+
+    def update_ui(self, turn, score_red_pl, score_white_pl, game_over):
+        self.v_game.turn = turn
+        self.v_game.score_red_player = score_red_pl
+        self.v_game.score_white_player = score_white_pl
+        self.v_game.game_over = game_over
+        self.red_player_widget.update_ui(self.v_game)
+        self.white_player_widget.update_ui(self.v_game)
 
 
 class Window(QMainWindow):
@@ -237,7 +282,7 @@ class Window(QMainWindow):
 
     def restart_game(self):
         # TODO
-        self.central_widget.update_ui()
+        return
 
 
 if __name__ == '__main__':
