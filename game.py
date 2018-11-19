@@ -58,6 +58,7 @@ class Player1Widget(QWidget):
         layout.addWidget(jumps_label, 2, 0, 1, 1)
         layout.addWidget(self.jumps_value, 2, 1, 1, 1)
         layout.addWidget(self.turn_label, 3, 0, 1, 2)
+        layout.setAlignment(Qt.AlignLeft)
         self.setLayout(layout)
 
     def update_ui(self):
@@ -83,6 +84,7 @@ class Player2Widget(QWidget):
         layout.addWidget(jumps_label, 2, 0, 1, 1)
         layout.addWidget(self.jumps_value, 2, 1, 1, 1)
         layout.addWidget(self.turn_label, 3, 0, 1, 2)
+        layout.setAlignment(Qt.AlignLeft)
         self.setLayout(layout)
 
     def update_ui(self):
