@@ -131,19 +131,6 @@ class GameBoardWidget(QFrame):
         self.sprite_sheet = QImage(696, 154, QImage.Format_ARGB32_Premultiplied)
         self.sprite_sheet.load("./res/sprite_sheet.png")
 
-    """
-    def init_matrix(self):
-        for i in range(8):
-            self.matrix.append([])
-            for j in range(8):
-                self.matrix[i].append(Cell.EMPTY)
-                if i % 2 == 0 and j % 2 > 0 or i % 2 > 0 and j % 2 == 0:
-                    if i < 3:
-                        self.matrix[i][j] = Cell.RED
-                    elif i > 4:
-                        self.matrix[i][j] = Cell.WHITE
-    """
-
     def get_targeted_rect(self, x, y):
         factor = 154 / 174
         scaled_w = self.CELL_SIZE * 0.7
