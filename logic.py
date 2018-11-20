@@ -6,7 +6,7 @@ from enum import Enum
 Defines which turn it is
 """
 class PlayerTurn(Enum):
-    BLACK = 0
+    RED = 0
     WHITE = 1
 
 """
@@ -14,8 +14,8 @@ Defines a cell
 """
 class CellState(Enum):
     EMPTY = 0
-    BLACK_MAN = 1
-    BLACK_KING = 2
+    RED_MAN = 1
+    RED_KING = 2
     WHITE_MAN = 3
     WHITE_KING = 4
 
@@ -27,8 +27,8 @@ class Game:
     def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.Cells = [[CellState.EMPTY for i in range(y)] for j in range(x)]
-        self.PlayerTurn = PlayerTurn.BLACK
+        self.Cells = []
+        self.PlayerTurn = PlayerTurn.RED
         self.ScoreBlack = 0
         self.ScoreWhite = 0
         self.Selected = False
@@ -69,34 +69,21 @@ class Game:
     """
 
     def InitializeBoard(self):
-        w, h = self.x, self.y
-        """
-        Setting top pawns, Black player
-        """
-        for y in range(0, 3):
-            if y % 2 == 0:
-                start = 0
-            else:
-                start = 1
-            for x in range(start, w, 2):
-                self.Cells[y][x] = CellState.BLACK_MAN
-
-        """
-        Setting bottom pawns, White player
-        """
-        for y in range(h - 1, h - 4, -1):
-            if y % 2 == 0:
-                start = 0
-            else:
-                start = 1
-            for x in range(start, w, 2):
-                self.Cells[y][x] = CellState.WHITE_MAN
+        for i in range(8):
+            self.Cells.append([])
+            for j in range(8):
+                self.Cells[i].append(CellState.EMPTY)
+                if i % 2 == 0 and j % 2 > 0 or i % 2 > 0 and j % 2 == 0:
+                    if i < 3:
+                        self.Cells[i][j] = CellState.RED_MAN
+                    elif i > 4:
+                        self.Cells[i][j] = CellState.WHITE_MAN
 
     def ChangeTurn(self):
-        if self.PlayerTurn == PlayerTurn.BLACK:
+        if self.PlayerTurn == PlayerTurn.RED:
             self.PlayerTurn = PlayerTurn.WHITE
         else:
-            self.PlayerTurn = PlayerTurn.BLACK
+            self.PlayerTurn = PlayerTurn.RED
 
     """
     Verifies if a click is valid
@@ -104,8 +91,8 @@ class Game:
 
     def ValidClick(self, x, y):
         # If the user click on its own color, we select the pawn
-        if ((self.Cells[y][x] == CellState.BLACK_KING or self.Cells[y][x] == CellState.BLACK_MAN) \
-            and self.PlayerTurn == PlayerTurn.BLACK) or \
+        if ((self.Cells[y][x] == CellState.RED_KING or self.Cells[y][x] == CellState.RED_MAN) \
+            and self.PlayerTurn == PlayerTurn.RED) or \
                 ((self.Cells[y][x] == CellState.WHITE_KING or self.Cells[y][x] == CellState.WHITE_MAN) \
                  and self.PlayerTurn == PlayerTurn.WHITE):
             self.SelectedPawn["x"] = int(x)
@@ -115,7 +102,7 @@ class Game:
             # Informs if White or Black selected
             if self.PlayerTurn == PlayerTurn.WHITE:
                 print("White player selected x:" + str(self.SelectedPawn["x"]) + " y:" + str(self.SelectedPawn["y"]))
-            elif self.PlayerTurn == PlayerTurn.BLACK:
+            elif self.PlayerTurn == PlayerTurn.RED:
                 print("Black player selected x:" + str(self.SelectedPawn["x"]) + " y:" + str(self.SelectedPawn["y"]))
             return True
 
@@ -152,11 +139,11 @@ class Game:
         # Verifies 1 block away
         if (self.SelectedPawn["y"] + 1 < self.y and self.SelectedPawn["x"] + 1 < self.x) \
                 and self.Cells[self.SelectedPawn["y"] + 1][self.SelectedPawn["x"] + 1] == CellState.EMPTY \
-                and self.PlayerTurn == PlayerTurn.BLACK:
+                and self.PlayerTurn == PlayerTurn.RED:
             self.PossibleMoves.append((self.SelectedPawn["x"] + 1, self.SelectedPawn["y"] + 1))
         if (self.SelectedPawn["y"] + 1 < self.y and self.SelectedPawn["x"] - 1 >= 0) \
                 and self.Cells[self.SelectedPawn["y"] + 1][self.SelectedPawn["x"] - 1] == CellState.EMPTY \
-                and self.PlayerTurn == PlayerTurn.BLACK:
+                and self.PlayerTurn == PlayerTurn.RED:
             self.PossibleMoves.append((self.SelectedPawn["x"] - 1, self.SelectedPawn["y"] + 1))
         if (self.SelectedPawn["y"] - 1 >= 0 and self.SelectedPawn["x"] + 1 < self.x) \
                 and self.Cells[self.SelectedPawn["y"] - 1][self.SelectedPawn["x"] + 1] == CellState.EMPTY \
@@ -172,27 +159,27 @@ class Game:
                 and self.Cells[self.SelectedPawn["y"] + 2][self.SelectedPawn["x"] + 2] == CellState.EMPTY \
                 and (self.Cells[self.SelectedPawn["y"] + 1][self.SelectedPawn["x"] + 1] == CellState.WHITE_MAN
                      or self.Cells[self.SelectedPawn["y"] + 1][self.SelectedPawn["x"] + 1] == CellState.WHITE_KING) \
-                and self.PlayerTurn == PlayerTurn.BLACK:
+                and self.PlayerTurn == PlayerTurn.RED:
             self.PossibleMoves.append((self.SelectedPawn["x"] + 2, self.SelectedPawn["y"] + 2))
 
         if (self.SelectedPawn["y"] + 2 < self.y and self.SelectedPawn["x"] - 2 >= 0) \
                 and self.Cells[self.SelectedPawn["y"] + 2][self.SelectedPawn["x"] - 2] == CellState.EMPTY \
                 and (self.Cells[self.SelectedPawn["y"] + 1][self.SelectedPawn["x"] - 1] == CellState.WHITE_MAN
                      or self.Cells[self.SelectedPawn["y"] + 1][self.SelectedPawn["x"] - 1] == CellState.WHITE_KING) \
-                and self.PlayerTurn == PlayerTurn.BLACK:
+                and self.PlayerTurn == PlayerTurn.RED:
             self.PossibleMoves.append((self.SelectedPawn["x"] - 2, self.SelectedPawn["y"] + 2))
 
         if (self.SelectedPawn["y"] - 2 >= 0 and self.SelectedPawn["x"] + 2 < self.x) \
                 and self.Cells[self.SelectedPawn["y"] - 2][self.SelectedPawn["x"] + 2] == CellState.EMPTY \
-                and (self.Cells[self.SelectedPawn["y"] - 1][self.SelectedPawn["x"] + 1] == CellState.BLACK_MAN
-                     or self.Cells[self.SelectedPawn["y"] - 1][self.SelectedPawn["x"] + 1] == CellState.BLACK_KING) \
+                and (self.Cells[self.SelectedPawn["y"] - 1][self.SelectedPawn["x"] + 1] == CellState.RED_MAN
+                     or self.Cells[self.SelectedPawn["y"] - 1][self.SelectedPawn["x"] + 1] == CellState.RED_KING) \
                 and self.PlayerTurn == PlayerTurn.WHITE:
             self.PossibleMoves.append((self.SelectedPawn["x"] + 2, self.SelectedPawn["y"] - 2))
 
         if (self.SelectedPawn["y"] - 2 >= 0 and self.SelectedPawn["x"] - 2 >= 0) \
                 and self.Cells[self.SelectedPawn["y"] - 2][self.SelectedPawn["x"] - 2] == CellState.EMPTY \
-                and (self.Cells[self.SelectedPawn["y"] - 1][self.SelectedPawn["x"] - 1] == CellState.BLACK_MAN
-                     or self.Cells[self.SelectedPawn["y"] - 1][self.SelectedPawn["x"] - 1] == CellState.BLACK_KING) \
+                and (self.Cells[self.SelectedPawn["y"] - 1][self.SelectedPawn["x"] - 1] == CellState.RED_MAN
+                     or self.Cells[self.SelectedPawn["y"] - 1][self.SelectedPawn["x"] - 1] == CellState.RED_KING) \
                 and self.PlayerTurn == PlayerTurn.WHITE:
             self.PossibleMoves.append((self.SelectedPawn["x"] - 2, self.SelectedPawn["y"] - 2))
 
@@ -220,9 +207,9 @@ class Game:
                 and self.Cells[self.SelectedPawn["y"] + 2][self.SelectedPawn["x"] + 2] == CellState.EMPTY \
                 and (((self.Cells[self.SelectedPawn["y"] + 1][self.SelectedPawn["x"] + 1] == CellState.WHITE_MAN
                        or self.Cells[self.SelectedPawn["y"] + 1][self.SelectedPawn["x"] + 1] == CellState.WHITE_KING)
-                      and self.PlayerTurn == PlayerTurn.BLACK)
-                     or ((self.Cells[self.SelectedPawn["y"] + 1][self.SelectedPawn["x"] + 1] == CellState.BLACK_KING
-                          or self.Cells[self.SelectedPawn["y"] + 1][self.SelectedPawn["x"] + 1] == CellState.BLACK_KING)
+                      and self.PlayerTurn == PlayerTurn.RED)
+                     or ((self.Cells[self.SelectedPawn["y"] + 1][self.SelectedPawn["x"] + 1] == CellState.RED_KING
+                          or self.Cells[self.SelectedPawn["y"] + 1][self.SelectedPawn["x"] + 1] == CellState.RED_KING)
                          and self.PlayerTurn == PlayerTurn.WHITE)):
             self.PossibleMoves.append((self.SelectedPawn["x"] + 2, self.SelectedPawn["y"] + 2))
 
@@ -230,9 +217,9 @@ class Game:
                 and self.Cells[self.SelectedPawn["y"] + 2][self.SelectedPawn["x"] - 2] == CellState.EMPTY \
                 and (((self.Cells[self.SelectedPawn["y"] + 1][self.SelectedPawn["x"] - 1] == CellState.WHITE_MAN
                        or self.Cells[self.SelectedPawn["y"] + 1][self.SelectedPawn["x"] - 1] == CellState.WHITE_KING)
-                      and self.PlayerTurn == PlayerTurn.BLACK)
-                     or ((self.Cells[self.SelectedPawn["y"] + 1][self.SelectedPawn["x"] - 1] == CellState.BLACK_KING
-                          or self.Cells[self.SelectedPawn["y"] + 1][self.SelectedPawn["x"] - 1] == CellState.BLACK_KING)
+                      and self.PlayerTurn == PlayerTurn.RED)
+                     or ((self.Cells[self.SelectedPawn["y"] + 1][self.SelectedPawn["x"] - 1] == CellState.RED_KING
+                          or self.Cells[self.SelectedPawn["y"] + 1][self.SelectedPawn["x"] - 1] == CellState.RED_KING)
                          and self.PlayerTurn == PlayerTurn.WHITE)):
             self.PossibleMoves.append((self.SelectedPawn["x"] - 2, self.SelectedPawn["y"] + 2))
 
@@ -240,9 +227,9 @@ class Game:
                 and self.Cells[self.SelectedPawn["y"] - 2][self.SelectedPawn["x"] + 2] == CellState.EMPTY \
                 and (((self.Cells[self.SelectedPawn["y"] - 1][self.SelectedPawn["x"] + 1] == CellState.WHITE_MAN
                        or self.Cells[self.SelectedPawn["y"] - 1][self.SelectedPawn["x"] + 1] == CellState.WHITE_KING)
-                      and self.PlayerTurn == PlayerTurn.BLACK)
-                     or ((self.Cells[self.SelectedPawn["y"] - 1][self.SelectedPawn["x"] + 1] == CellState.BLACK_KING
-                          or self.Cells[self.SelectedPawn["y"] - 1][self.SelectedPawn["x"] + 1] == CellState.BLACK_KING)
+                      and self.PlayerTurn == PlayerTurn.RED)
+                     or ((self.Cells[self.SelectedPawn["y"] - 1][self.SelectedPawn["x"] + 1] == CellState.RED_KING
+                          or self.Cells[self.SelectedPawn["y"] - 1][self.SelectedPawn["x"] + 1] == CellState.RED_KING)
                          and self.PlayerTurn == PlayerTurn.WHITE)):
             self.PossibleMoves.append((self.SelectedPawn["x"] + 2, self.SelectedPawn["y"] - 2))
 
@@ -250,9 +237,9 @@ class Game:
                 and self.Cells[self.SelectedPawn["y"] - 2][self.SelectedPawn["x"] - 2] == CellState.EMPTY \
                 and (((self.Cells[self.SelectedPawn["y"] - 1][self.SelectedPawn["x"] - 1] == CellState.WHITE_MAN
                        or self.Cells[self.SelectedPawn["y"] - 1][self.SelectedPawn["x"] - 1] == CellState.WHITE_KING)
-                      and self.PlayerTurn == PlayerTurn.BLACK)
-                     or ((self.Cells[self.SelectedPawn["y"] - 1][self.SelectedPawn["x"] - 1] == CellState.BLACK_KING
-                          or self.Cells[self.SelectedPawn["y"] - 1][self.SelectedPawn["x"] - 1] == CellState.BLACK_KING)
+                      and self.PlayerTurn == PlayerTurn.RED)
+                     or ((self.Cells[self.SelectedPawn["y"] - 1][self.SelectedPawn["x"] - 1] == CellState.RED_KING
+                          or self.Cells[self.SelectedPawn["y"] - 1][self.SelectedPawn["x"] - 1] == CellState.RED_KING)
                          and self.PlayerTurn == PlayerTurn.WHITE)):
             self.PossibleMoves.append((self.SelectedPawn["x"] - 2, self.SelectedPawn["y"] - 2))
 
@@ -262,10 +249,10 @@ class Game:
 
     def GetPossibleMoves(self):
         self.PossibleMoves = []
-        if self.Cells[self.SelectedPawn["y"]][self.SelectedPawn["x"]] == CellState.BLACK_KING or \
+        if self.Cells[self.SelectedPawn["y"]][self.SelectedPawn["x"]] == CellState.RED_KING or \
                 self.Cells[self.SelectedPawn["y"]][self.SelectedPawn["x"]] == CellState.WHITE_KING:
             self.GetKingMoves()
-        elif self.Cells[self.SelectedPawn["y"]][self.SelectedPawn["x"]] == CellState.BLACK_MAN or \
+        elif self.Cells[self.SelectedPawn["y"]][self.SelectedPawn["x"]] == CellState.RED_MAN or \
                 self.Cells[self.SelectedPawn["y"]][self.SelectedPawn["x"]] == CellState.WHITE_MAN:
             self.GetManMoves()
 
@@ -282,25 +269,25 @@ class Game:
                     and self.PlayerTurn == PlayerTurn.WHITE:
                 # Top Left
                 self.Move(x, y)
-                self.PlayerTurn = PlayerTurn.BLACK
+                self.PlayerTurn = PlayerTurn.RED
                 self.Selected = False
                 return True
             elif x - 1 == self.SelectedPawn["x"] and y + 1 == self.SelectedPawn["y"] \
                     and self.PlayerTurn == PlayerTurn.WHITE:
                 # Top Right
                 self.Move(x, y)
-                self.PlayerTurn = PlayerTurn.BLACK
+                self.PlayerTurn = PlayerTurn.RED
                 self.Selected = False
                 return True
             elif x + 1 == self.SelectedPawn["x"] and y - 1 == self.SelectedPawn["y"] \
-                    and self.PlayerTurn == PlayerTurn.BLACK:
+                    and self.PlayerTurn == PlayerTurn.RED:
                 # Down Left
                 self.Move(x, y)
                 self.PlayerTurn = PlayerTurn.WHITE
                 self.Selected = False
                 return True
             elif x - 1 == self.SelectedPawn["x"] and y - 1 == self.SelectedPawn["y"] \
-                    and self.PlayerTurn == PlayerTurn.BLACK:
+                    and self.PlayerTurn == PlayerTurn.RED:
                 # Down Right
                 self.Move(x, y)
                 self.PlayerTurn = PlayerTurn.WHITE
@@ -313,7 +300,7 @@ class Game:
             if x + 2 == self.SelectedPawn["x"] and y + 2 == self.SelectedPawn["y"] \
                     and self.PlayerTurn == PlayerTurn.WHITE:
                 # Top Left
-                if self.Cells[y + 1][x + 1] == CellState.BLACK_KING or self.Cells[y + 1][x + 1] == CellState.BLACK_MAN:
+                if self.Cells[y + 1][x + 1] == CellState.RED_KING or self.Cells[y + 1][x + 1] == CellState.RED_MAN:
                     print("White player ate a Black pawn")
                     self.ScoreWhite += 1
                     self.Cells[y + 1][x + 1] = CellState.EMPTY
@@ -325,7 +312,7 @@ class Game:
                 else:
                     return False
             elif x + 2 == self.SelectedPawn["x"] and y - 2 == self.SelectedPawn["y"] \
-                    and self.PlayerTurn == PlayerTurn.BLACK:
+                    and self.PlayerTurn == PlayerTurn.RED:
                 # Down Left
                 if self.Cells[y - 1][x + 1] == CellState.WHITE_KING or self.Cells[y - 1][x + 1] == CellState.WHITE_MAN:
                     print("Black player ate a White pawn")
@@ -341,7 +328,7 @@ class Game:
             elif x - 2 == self.SelectedPawn["x"] and y + 2 == self.SelectedPawn["y"] \
                     and self.PlayerTurn == PlayerTurn.WHITE:
                 # Top Right
-                if self.Cells[y + 1][x + 1] == CellState.BLACK_KING or self.Cells[y + 1][x - 1] == CellState.BLACK_MAN:
+                if self.Cells[y + 1][x + 1] == CellState.RED_KING or self.Cells[y + 1][x - 1] == CellState.RED_MAN:
                     print("White player ate a Black pawn")
                     self.ScoreWhite += 1
                     self.Cells[y + 1][x - 1] = CellState.EMPTY
@@ -353,7 +340,7 @@ class Game:
                 else:
                     return False
             elif x - 2 == self.SelectedPawn["x"] and y - 2 == self.SelectedPawn["y"] \
-                    and self.PlayerTurn == PlayerTurn.BLACK:
+                    and self.PlayerTurn == PlayerTurn.RED:
                 # Down Right
                 if self.Cells[y - 1][x - 1] == CellState.WHITE_KING or self.Cells[y - 1][x - 1] == CellState.WHITE_MAN:
                     print("Black player ate a White pawn")
@@ -378,10 +365,10 @@ class Game:
                 abs(y - self.SelectedPawn["y"]) == 1 and \
                 self.Cells[y][x] == CellState.EMPTY:
             self.Move(x, y)
-            if self.PlayerTurn == PlayerTurn.BLACK:
+            if self.PlayerTurn == PlayerTurn.RED:
                 self.PlayerTurn = PlayerTurn.WHITE
             else:
-                self.PlayerTurn = PlayerTurn.BLACK
+                self.PlayerTurn = PlayerTurn.RED
             self.Selected = False
             return True
         # If the destination is two cells away
@@ -391,7 +378,7 @@ class Game:
             if x + 2 == self.SelectedPawn["x"] and y + 2 == self.SelectedPawn["y"]:
                 # Top Left
                 if (self.Cells[y + 1][x + 1] == CellState.WHITE_KING or self.Cells[y + 1][x + 1] == CellState.WHITE_MAN) \
-                        and self.PlayerTurn == PlayerTurn.BLACK:
+                        and self.PlayerTurn == PlayerTurn.RED:
                     print("Black player ate a White pawn")
                     self.ScoreBlack += 1
                     self.Cells[y + 1][x + 1] = CellState.EMPTY
@@ -400,8 +387,8 @@ class Game:
                     if len(self.PossibleMoves) == 0:
                         self.ChangeTurn()
                     return True
-                elif (self.Cells[y + 1][x + 1] == CellState.BLACK_KING or self.Cells[y + 1][
-                    x + 1] == CellState.BLACK_MAN) \
+                elif (self.Cells[y + 1][x + 1] == CellState.RED_KING or self.Cells[y + 1][
+                    x + 1] == CellState.RED_MAN) \
                         and self.PlayerTurn == PlayerTurn.WHITE:
                     print("White player ate a Black pawn")
                     self.ScoreWhite += 1
@@ -416,7 +403,7 @@ class Game:
             elif x + 2 == self.SelectedPawn["x"] and y - 2 == self.SelectedPawn["y"]:
                 # Down Left
                 if (self.Cells[y - 1][x + 1] == CellState.WHITE_KING or self.Cells[y - 1][x + 1] == CellState.WHITE_MAN) \
-                        and self.PlayerTurn == PlayerTurn.BLACK:
+                        and self.PlayerTurn == PlayerTurn.RED:
                     print("Black player ate a White pawn")
                     self.ScoreBlack += 1
                     self.Cells[y - 1][x + 1] = CellState.EMPTY
@@ -425,8 +412,8 @@ class Game:
                     if len(self.PossibleMoves) == 0:
                         self.ChangeTurn()
                     return True
-                elif (self.Cells[y - 1][x + 1] == CellState.BLACK_KING or self.Cells[y - 1][
-                    x + 1] == CellState.BLACK_MAN) \
+                elif (self.Cells[y - 1][x + 1] == CellState.RED_KING or self.Cells[y - 1][
+                    x + 1] == CellState.RED_MAN) \
                         and self.PlayerTurn == PlayerTurn.WHITE:
                     print("White player ate a Black pawn")
                     self.ScoreWhite += 1
@@ -441,7 +428,7 @@ class Game:
             elif x - 2 == self.SelectedPawn["x"] and y + 2 == self.SelectedPawn["y"]:
                 # Top Right
                 if (self.Cells[y + 1][x - 1] == CellState.WHITE_KING or self.Cells[y + 1][x - 1] == CellState.WHITE_MAN) \
-                        and self.PlayerTurn == PlayerTurn.BLACK:
+                        and self.PlayerTurn == PlayerTurn.RED:
                     print("Black player ate a White pawn")
                     self.ScoreBlack += 1
                     self.Cells[y + 1][x - 1] = CellState.EMPTY
@@ -450,8 +437,8 @@ class Game:
                     if len(self.PossibleMoves) == 0:
                         self.ChangeTurn()
                     return True
-                elif (self.Cells[y + 1][x + 1] == CellState.BLACK_KING or self.Cells[y + 1][
-                    x - 1] == CellState.BLACK_MAN) \
+                elif (self.Cells[y + 1][x + 1] == CellState.RED_KING or self.Cells[y + 1][
+                    x - 1] == CellState.RED_MAN) \
                         and self.PlayerTurn == PlayerTurn.WHITE:
                     print("White player ate a Black pawn")
                     self.ScoreWhite += 1
@@ -466,7 +453,7 @@ class Game:
             elif x - 2 == self.SelectedPawn["x"] and y - 2 == self.SelectedPawn["y"]:
                 # Down Right
                 if (self.Cells[y - 1][x - 1] == CellState.WHITE_KING or self.Cells[y - 1][x - 1] == CellState.WHITE_MAN) \
-                        and self.PlayerTurn == PlayerTurn.BLACK:
+                        and self.PlayerTurn == PlayerTurn.RED:
                     print("Black player ate a White pawn")
                     self.ScoreBlack += 1
                     self.Cells[y - 1][x - 1] = CellState.EMPTY
@@ -475,8 +462,8 @@ class Game:
                     if len(self.PossibleMoves) == 0:
                         self.ChangeTurn()
                     return True
-                elif (self.Cells[y - 1][x - 1] == CellState.BLACK_KING or self.Cells[y - 1][
-                    x - 1] == CellState.BLACK_MAN) \
+                elif (self.Cells[y - 1][x - 1] == CellState.RED_KING or self.Cells[y - 1][
+                    x - 1] == CellState.RED_MAN) \
                         and self.PlayerTurn == PlayerTurn.WHITE:
                     print("White player ate a Black pawn")
                     self.ScoreWhite += 1
@@ -497,11 +484,11 @@ class Game:
     def PerformMove(self, x, y):
         # If the pawn is a man
         if self.Cells[self.SelectedPawn["y"]][self.SelectedPawn["x"]] == CellState.WHITE_MAN or \
-                self.Cells[self.SelectedPawn["y"]][self.SelectedPawn["x"]] == CellState.BLACK_MAN:
+                self.Cells[self.SelectedPawn["y"]][self.SelectedPawn["x"]] == CellState.RED_MAN:
             return self.PerformManMove(x, y)
         # If the pawn is a king
         elif self.Cells[self.SelectedPawn["y"]][self.SelectedPawn["x"]] == CellState.WHITE_KING or \
-                self.Cells[self.SelectedPawn["y"]][self.SelectedPawn["x"]] == CellState.BLACK_KING:
+                self.Cells[self.SelectedPawn["y"]][self.SelectedPawn["x"]] == CellState.RED_KING:
             return self.PerformKingMove(x, y)
         return False
 
@@ -514,9 +501,9 @@ class Game:
             for x in y:
                 if x == CellState.EMPTY:
                     print(0, end='')
-                elif x == CellState.BLACK_MAN:
+                elif x == CellState.RED_MAN:
                     print(1, end='')
-                elif x == CellState.BLACK_KING:
+                elif x == CellState.RED_KING:
                     print(2, end='')
                 elif x == CellState.WHITE_MAN:
                     print(3, end='')

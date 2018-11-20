@@ -7,7 +7,7 @@ import logic
 
 
 class VarsGame:
-    def __init__(self, turn=logic.PlayerTurn.BLACK, score_red_player=0, score_white_player=0, game_over=False):
+    def __init__(self, turn=logic.PlayerTurn.RED, score_red_player=0, score_white_player=0, game_over=False):
         self.turn = turn
         self.score_red_player = score_red_player
         self.score_white_player = score_white_player
@@ -15,7 +15,7 @@ class VarsGame:
 
 
 class PieceIndicator(QFrame):
-    def __init__(self, parent=None, player=logic.PlayerTurn.BLACK):
+    def __init__(self, parent=None, player=logic.PlayerTurn.RED):
         super().__init__(parent)
 
         self.player = player
@@ -37,7 +37,7 @@ class PieceIndicator(QFrame):
     def paintEvent(self, event):
         painter = QPainter(self)
         target = self.get_targeted_rect(0, 0)
-        if self.player == logic.PlayerTurn.BLACK:
+        if self.player == logic.PlayerTurn.RED:
             painter.drawImage(target, self.sprite_sheet, QRectF(0, 0, 174, 154))
         else:
             painter.drawImage(target, self.sprite_sheet, QRectF(348, 0, 174, 154))
@@ -51,7 +51,7 @@ class RedPlayerWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        piece_indicator = PieceIndicator(self, logic.PlayerTurn.BLACK)
+        piece_indicator = PieceIndicator(self, logic.PlayerTurn.RED)
         score_label = QLabel("score:")
         self.score_value = QLabel("0")
         jumps_label = QLabel("jumps:")
@@ -76,7 +76,7 @@ class RedPlayerWidget(QWidget):
             else:
                 self.turn_label.setText("")
             return
-        if v_game.turn == logic.PlayerTurn.BLACK:
+        if v_game.turn == logic.PlayerTurn.RED:
             self.turn_label.setText("Your turn")
         else:
             self.turn_label.setText("")
@@ -164,9 +164,9 @@ class GameBoardWidget(QFrame):
                     painter.fillRect(x, y, self.CELL_SIZE, self.CELL_SIZE, Qt.darkGreen)
                 elif i % 2 == 0 and j % 2 == 0 or i % 2 > 0 and j % 2 > 0:
                     painter.fillRect(x, y, self.CELL_SIZE, self.CELL_SIZE, Qt.lightGray)
-                if self.game.Cells[i][j] == logic.CellState.BLACK_MAN:
+                if self.game.Cells[i][j] == logic.CellState.RED_MAN:
                     painter.drawImage(target, self.sprite_sheet, QRectF(0, 0, 174, 154))
-                elif self.game.Cells[i][j] == logic.CellState.BLACK_KING:
+                elif self.game.Cells[i][j] == logic.CellState.RED_KING:
                     painter.drawImage(target, self.sprite_sheet, QRectF(174, 0, 174, 154))
                 elif self.game.Cells[i][j] == logic.CellState.WHITE_MAN:
                     painter.drawImage(target, self.sprite_sheet, QRectF(348, 0, 174, 154))
@@ -190,9 +190,9 @@ class GameBoardWidget(QFrame):
 
             for coordinates in self.game.PossibleMoves:
                 target = self.get_targeted_rect(coordinates[0] * self.CELL_SIZE, coordinates[1] * self.CELL_SIZE)
-                if self.game.Cells[row][col] == logic.CellState.BLACK_MAN:
+                if self.game.Cells[row][col] == logic.CellState.RED_MAN:
                     painter.drawImage(target, self.sprite_sheet, QRectF(0, 154, 174, 154))
-                elif self.game.Cells[row][col] == logic.CellState.BLACK_KING:
+                elif self.game.Cells[row][col] == logic.CellState.RED_KING:
                     painter.drawImage(target, self.sprite_sheet, QRectF(174, 154, 174, 154))
                 elif self.game.Cells[row][col] == logic.CellState.WHITE_MAN:
                     painter.drawImage(target, self.sprite_sheet, QRectF(348, 154, 174, 154))
