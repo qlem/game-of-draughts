@@ -93,7 +93,7 @@ class Game:
     def ValidClick(self, x, y):
         # If the user click on its own color, we select the pawn
         if (((self.Cells[y][x] == CellState.RED_KING or self.Cells[y][x] == CellState.RED_MAN) \
-            and self.PlayerTurn == PlayerTurn.RED) or \
+            and self.PlayerTurn == PlayerTurn.RED and (self.Capturing == False)) or \
                 ((self.Cells[y][x] == CellState.WHITE_KING or self.Cells[y][x] == CellState.WHITE_MAN) \
                  and self.PlayerTurn == PlayerTurn.WHITE) and (self.Capturing == False)):
             self.SelectedPawn["x"] = int(x)
@@ -112,7 +112,9 @@ class Game:
             # Verifies if the second click is doable and performs it
             if self.PerformMove(x, y):
                 # Cleans possible moves
-                self.PossibleMoves = []
+                print("cleans moves")
+                if not self.Capturing:
+                    self.PossibleMoves = []
                 # Verifies if the game is over
                 if self.ScoreWhite == 12 or self.ScoreBlack == 12:
                     self.GameOver = True
@@ -198,6 +200,7 @@ class Game:
     """
 
     def GetKingMoves(self):
+        print("get king moves")
         # Verifies 1 block away
         if (self.SelectedPawn["y"] + 1 < self.y and self.SelectedPawn["x"] + 1 < self.x) \
                 and self.Cells[self.SelectedPawn["y"] + 1][self.SelectedPawn["x"] + 1] == CellState.EMPTY:
@@ -212,13 +215,13 @@ class Game:
                 and self.Cells[self.SelectedPawn["y"] - 1][self.SelectedPawn["x"] - 1] == CellState.EMPTY:
             self.PossibleMoves.append((self.SelectedPawn["x"] - 1, self.SelectedPawn["y"] - 1))
 
-        # Verifies if the man can capture another pawn
+        # Verifies if the King can capture another pawn
         if (self.SelectedPawn["y"] + 2 < self.y and self.SelectedPawn["x"] + 2 < self.x) \
                 and self.Cells[self.SelectedPawn["y"] + 2][self.SelectedPawn["x"] + 2] == CellState.EMPTY \
                 and (((self.Cells[self.SelectedPawn["y"] + 1][self.SelectedPawn["x"] + 1] == CellState.WHITE_MAN
                        or self.Cells[self.SelectedPawn["y"] + 1][self.SelectedPawn["x"] + 1] == CellState.WHITE_KING)
                       and self.PlayerTurn == PlayerTurn.RED)
-                     or ((self.Cells[self.SelectedPawn["y"] + 1][self.SelectedPawn["x"] + 1] == CellState.RED_KING
+                     or ((self.Cells[self.SelectedPawn["y"] + 1][self.SelectedPawn["x"] + 1] == CellState.RED_MAN
                           or self.Cells[self.SelectedPawn["y"] + 1][self.SelectedPawn["x"] + 1] == CellState.RED_KING)
                          and self.PlayerTurn == PlayerTurn.WHITE)):
             self.PossibleMoves.append((self.SelectedPawn["x"] + 2, self.SelectedPawn["y"] + 2))
@@ -228,7 +231,7 @@ class Game:
                 and (((self.Cells[self.SelectedPawn["y"] + 1][self.SelectedPawn["x"] - 1] == CellState.WHITE_MAN
                        or self.Cells[self.SelectedPawn["y"] + 1][self.SelectedPawn["x"] - 1] == CellState.WHITE_KING)
                       and self.PlayerTurn == PlayerTurn.RED)
-                     or ((self.Cells[self.SelectedPawn["y"] + 1][self.SelectedPawn["x"] - 1] == CellState.RED_KING
+                     or ((self.Cells[self.SelectedPawn["y"] + 1][self.SelectedPawn["x"] - 1] == CellState.RED_MAN
                           or self.Cells[self.SelectedPawn["y"] + 1][self.SelectedPawn["x"] - 1] == CellState.RED_KING)
                          and self.PlayerTurn == PlayerTurn.WHITE)):
             self.PossibleMoves.append((self.SelectedPawn["x"] - 2, self.SelectedPawn["y"] + 2))
@@ -238,7 +241,7 @@ class Game:
                 and (((self.Cells[self.SelectedPawn["y"] - 1][self.SelectedPawn["x"] + 1] == CellState.WHITE_MAN
                        or self.Cells[self.SelectedPawn["y"] - 1][self.SelectedPawn["x"] + 1] == CellState.WHITE_KING)
                       and self.PlayerTurn == PlayerTurn.RED)
-                     or ((self.Cells[self.SelectedPawn["y"] - 1][self.SelectedPawn["x"] + 1] == CellState.RED_KING
+                     or ((self.Cells[self.SelectedPawn["y"] - 1][self.SelectedPawn["x"] + 1] == CellState.RED_MAN
                           or self.Cells[self.SelectedPawn["y"] - 1][self.SelectedPawn["x"] + 1] == CellState.RED_KING)
                          and self.PlayerTurn == PlayerTurn.WHITE)):
             self.PossibleMoves.append((self.SelectedPawn["x"] + 2, self.SelectedPawn["y"] - 2))
@@ -248,7 +251,7 @@ class Game:
                 and (((self.Cells[self.SelectedPawn["y"] - 1][self.SelectedPawn["x"] - 1] == CellState.WHITE_MAN
                        or self.Cells[self.SelectedPawn["y"] - 1][self.SelectedPawn["x"] - 1] == CellState.WHITE_KING)
                       and self.PlayerTurn == PlayerTurn.RED)
-                     or ((self.Cells[self.SelectedPawn["y"] - 1][self.SelectedPawn["x"] - 1] == CellState.RED_KING
+                     or ((self.Cells[self.SelectedPawn["y"] - 1][self.SelectedPawn["x"] - 1] == CellState.RED_MAN
                           or self.Cells[self.SelectedPawn["y"] - 1][self.SelectedPawn["x"] - 1] == CellState.RED_KING)
                          and self.PlayerTurn == PlayerTurn.WHITE)):
             self.PossibleMoves.append((self.SelectedPawn["x"] - 2, self.SelectedPawn["y"] - 2))
@@ -265,6 +268,18 @@ class Game:
         elif self.Cells[self.SelectedPawn["y"]][self.SelectedPawn["x"]] == CellState.RED_MAN or \
                 self.Cells[self.SelectedPawn["y"]][self.SelectedPawn["x"]] == CellState.WHITE_MAN:
             self.GetManMoves()
+        self.PrintPossibleMoves()
+
+    """
+    Method which defines if a pawn can still capture after a move
+    """
+
+    def CanCapture(self):
+        for x, y in self.PossibleMoves:
+            if abs(x - self.SelectedPawn["x"]) == 2 and abs(y - self.SelectedPawn["y"]) == 2:
+                print("Pawn can still capture")
+                return True
+        return False
 
     """
     Verifies if the selected man can move at the clicked position
@@ -294,7 +309,7 @@ class Game:
                     self.SelectedPawn["y"] = y
                     self.SelectedPawn["x"] = x
                     self.GetPossibleMoves()
-                    if len(self.PossibleMoves) > 0:
+                    if self.CanCapture():
                         self.Capturing = True
                     else:
                         self.Selected = False
@@ -314,7 +329,7 @@ class Game:
                     self.SelectedPawn["y"] = y
                     self.SelectedPawn["x"] = x
                     self.GetPossibleMoves()
-                    if len(self.PossibleMoves) > 0:
+                    if self.CanCapture():
                         self.Capturing = True
                     else:
                         self.Selected = False
@@ -334,7 +349,7 @@ class Game:
                     self.SelectedPawn["y"] = y
                     self.SelectedPawn["x"] = x
                     self.GetPossibleMoves()
-                    if len(self.PossibleMoves) > 0:
+                    if self.CanCapture():
                         self.Capturing = True
                     else:
                         self.Selected = False
@@ -354,7 +369,7 @@ class Game:
                     self.SelectedPawn["y"] = y
                     self.SelectedPawn["x"] = x
                     self.GetPossibleMoves()
-                    if len(self.PossibleMoves) > 0:
+                    if self.CanCapture():
                         self.Capturing = True
                     else:
                         self.Selected = False
@@ -393,7 +408,7 @@ class Game:
                     self.SelectedPawn["y"] = y
                     self.SelectedPawn["x"] = x
                     self.GetPossibleMoves()
-                    if len(self.PossibleMoves) > 0:
+                    if self.CanCapture():
                         self.Capturing = True
                     else:
                         self.Selected = False
@@ -409,7 +424,7 @@ class Game:
                     self.SelectedPawn["y"] = y
                     self.SelectedPawn["x"] = x
                     self.GetPossibleMoves()
-                    if len(self.PossibleMoves) > 0:
+                    if self.CanCapture():
                         self.Capturing = True
                     else:
                         self.Selected = False
@@ -429,7 +444,7 @@ class Game:
                     self.SelectedPawn["y"] = y
                     self.SelectedPawn["x"] = x
                     self.GetPossibleMoves()
-                    if len(self.PossibleMoves) > 0:
+                    if self.CanCapture():
                         self.Capturing = True
                     else:
                         self.Selected = False
@@ -445,7 +460,7 @@ class Game:
                     self.SelectedPawn["y"] = y
                     self.SelectedPawn["x"] = x
                     self.GetPossibleMoves()
-                    if len(self.PossibleMoves) > 0:
+                    if self.CanCapture():
                         self.Capturing = True
                     else:
                         self.Selected = False
@@ -465,7 +480,7 @@ class Game:
                     self.SelectedPawn["y"] = y
                     self.SelectedPawn["x"] = x
                     self.GetPossibleMoves()
-                    if len(self.PossibleMoves) > 0:
+                    if self.CanCapture():
                         self.Capturing = True
                     else:
                         self.Selected = False
@@ -481,7 +496,7 @@ class Game:
                     self.SelectedPawn["y"] = y
                     self.SelectedPawn["x"] = x
                     self.GetPossibleMoves()
-                    if len(self.PossibleMoves) > 0:
+                    if self.CanCapture():
                         self.Capturing = True
                     else:
                         self.Selected = False
@@ -501,7 +516,7 @@ class Game:
                     self.SelectedPawn["y"] = y
                     self.SelectedPawn["x"] = x
                     self.GetPossibleMoves()
-                    if len(self.PossibleMoves) > 0:
+                    if self.CanCapture():
                         self.Capturing = True
                     else:
                         self.Selected = False
@@ -517,7 +532,7 @@ class Game:
                     self.SelectedPawn["y"] = y
                     self.SelectedPawn["x"] = x
                     self.GetPossibleMoves()
-                    if len(self.PossibleMoves) > 0:
+                    if self.CanCapture():
                         self.Capturing = True
                     else:
                         self.Selected = False
