@@ -112,7 +112,9 @@ class Game:
             # Verifies if the second click is doable and performs it
             if self.PerformMove(x, y):
                 # Cleans possible moves
-                self.PossibleMoves = []
+                print("cleans moves")
+                if not self.Capturing:
+                    self.PossibleMoves = []
                 # Verifies if the game is over
                 if self.ScoreWhite == 12 or self.ScoreBlack == 12:
                     self.GameOver = True
