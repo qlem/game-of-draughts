@@ -39,36 +39,10 @@ class Game:
 
         self.InitializeBoard()
 
-        #self.RunTest()
-
-    def RunTest(self):
-        self.PrintCells()
-        self.ValidClick(0, 2)
-        self.PrintPossibleMoves()
-        self.ValidClick(1, 3)
-        self.PrintCells()
-
-        self.ValidClick(1, 3)
-        self.ValidClick(0, 2)
-
-        self.ValidClick(3, 5)
-        self.ValidClick(2, 4)
-        self.PrintCells()
-
-        self.ValidClick(1, 3)
-        print(self.PossibleMoves)
-        self.ValidClick(3, 5)
-        self.PrintCells()
-        print(self.PossibleMoves)
-
-        self.ValidClick(2, 4)
-        self.ValidClick(5, 7)
-
     """
     Initializes the board game depending on x and y board sizes
     For now it only fills 3 lines of pawns for each player
     """
-
     def InitializeBoard(self):
         for i in range(8):
             self.Cells.append([])
@@ -80,6 +54,9 @@ class Game:
                     elif i > 4:
                         self.Cells[i][j] = CellState.WHITE_MAN
 
+    """
+    Changes the current turn   
+    """
     def ChangeTurn(self):
         if self.PlayerTurn == PlayerTurn.RED:
             self.PlayerTurn = PlayerTurn.WHITE
@@ -88,8 +65,8 @@ class Game:
 
     """
     Verifies if a click is valid
+    Performs actions depending on saved variables such as the selected pawn
     """
-
     def ValidClick(self, x, y):
         # If the user click on its own color, we select the pawn
         if (((self.Cells[y][x] == CellState.RED_KING or self.Cells[y][x] == CellState.RED_MAN) \
@@ -136,7 +113,6 @@ class Game:
     """
     Method which moves the selected pawn to the coordinates
     """
-
     def Move(self, x, y):
         # Moves the selected pawn to the new location
         self.Cells[y][x] = self.Cells[self.SelectedPawn["y"]][self.SelectedPawn["x"]]
@@ -146,7 +122,6 @@ class Game:
     """
     Retrieves possible moves from the selected man
     """
-
     def GetManMoves(self):
         # Verifies 1 block away
         if (self.SelectedPawn["y"] + 1 < self.y and self.SelectedPawn["x"] + 1 < self.x) \
@@ -198,7 +173,6 @@ class Game:
     """
     Retrieves possible moves from the selected king
     """
-
     def GetKingMoves(self):
         print("get king moves")
         # Verifies 1 block away
@@ -259,7 +233,6 @@ class Game:
     """
     Method called after a man captured another to know if it can still perform any move
     """
-
     def GetPossibleMoves(self):
         self.PossibleMoves = []
         if self.Cells[self.SelectedPawn["y"]][self.SelectedPawn["x"]] == CellState.RED_KING or \
@@ -273,7 +246,6 @@ class Game:
     """
     Method which defines if a pawn can still capture after a move
     """
-
     def CanCapture(self):
         for x, y in self.PossibleMoves:
             if abs(x - self.SelectedPawn["x"]) == 2 and abs(y - self.SelectedPawn["y"]) == 2:
@@ -284,7 +256,6 @@ class Game:
     """
     Verifies if the selected man can move at the clicked position
     """
-
     def PerformManMove(self, x, y):
         # If the destination is one cell away
         if abs(x - self.SelectedPawn["x"]) == 1 and \
@@ -383,7 +354,6 @@ class Game:
     """
     Verifies if the selected king can move at the clicked position
     """
-
     def PerformKingMove(self, x, y):
         # If the destination is one cell away
         if abs(x - self.SelectedPawn["x"]) == 1 and \
@@ -546,7 +516,6 @@ class Game:
     """
     Defines if a move is possible
     """
-
     def PerformMove(self, x, y):
         # If the pawn is a man
         if self.Cells[self.SelectedPawn["y"]][self.SelectedPawn["x"]] == CellState.WHITE_MAN or \
@@ -561,7 +530,6 @@ class Game:
     """
     DEBUG Method : prints the board cells differently for visibility
     """
-
     def PrintCells(self):
         for y in self.Cells:
             for x in y:
