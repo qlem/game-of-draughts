@@ -5,6 +5,7 @@ import sys
 import logic
 
 
+# This class stores the variables of the current game.
 class VarsGame:
     def __init__(self, turn=logic.PlayerTurn.RED, score_red_player=0, score_white_player=0, game_over=False):
         self.turn = turn
@@ -13,17 +14,22 @@ class VarsGame:
         self.game_over = game_over
 
 
+# This class defines a simple widget that displays the pawn's picture that represents the player.
 class PieceIndicator(QFrame):
     def __init__(self, parent=None, player=logic.PlayerTurn.RED):
         super().__init__(parent)
 
+        # init the player
         self.player = player
 
+        # init the size of the widget
         self.setFixedSize(100, 100)
 
+        # init the sprite sheet that contains the resources
         self.sprite_sheet = QImage(696, 154, QImage.Format_ARGB32_Premultiplied)
         self.sprite_sheet.load("./res/sprite_sheet.png")
 
+    # This function return the targeted area where the pawn will be drawn.
     @staticmethod
     def get_targeted_rect(x, y):
         factor = 154 / 174
@@ -33,6 +39,7 @@ class PieceIndicator(QFrame):
         y = y + 50 - scaled_h / 2
         return QRectF(x, y, scaled_w, scaled_h)
 
+    # This function is called for draw the widget (a pawn and borders).
     def paintEvent(self, event):
         painter = QPainter(self)
         target = self.get_targeted_rect(0, 0)
@@ -46,12 +53,15 @@ class PieceIndicator(QFrame):
         painter.drawRect(borders)
 
 
+# This is the widget that displays the information about one player.
 class InfoPlayerWidget(QWidget):
     def __init__(self, parent=None, player=logic.PlayerTurn.RED):
         super().__init__(parent)
 
+        # init the player
         self.player = player
 
+        # init the elements that compose the UI
         piece_indicator = PieceIndicator(self, self.player)
         score_label = QLabel("score")
         self.score_value = QLabel("0")
@@ -59,6 +69,7 @@ class InfoPlayerWidget(QWidget):
         self.jumps_value = QLabel("0")
         self.turn_label = QLabel("Your turn")
 
+        # apply some styles
         score_label.setStyleSheet("font-size: 25px")
         self.score_value.setStyleSheet("font: bold; font-size: 30px")
         jumps_label.setStyleSheet("font-size: 25px")
@@ -66,6 +77,7 @@ class InfoPlayerWidget(QWidget):
         self.turn_label.setStyleSheet("background: blue; color:white; font: bold; font-size: 30px; "
                                       "padding: 5px 10px 5px 10px;")
 
+        # init the layout
         layout = QGridLayout()
         layout.addWidget(piece_indicator, 0, 0, 1, 2)
         layout.addWidget(score_label, 1, 0, 1, 1)
@@ -76,12 +88,18 @@ class InfoPlayerWidget(QWidget):
         layout.setAlignment(Qt.AlignLeft)
         self.setLayout(layout)
 
+    # This function is called for refresh the UI with the current game vars.
     def update_ui(self, v_game):
+
+        # refresh the score
         if self.player == logic.PlayerTurn.RED:
             self.score_value.setText(str(v_game.score_red_player))
         else:
             self.score_value.setText(str(v_game.score_white_player))
 
+        # TODO refresh jumps
+
+        # refresh the winner label
         self.turn_label.hide()
         if v_game.game_over and self.player == logic.PlayerTurn.RED and \
                 v_game.score_red_player > v_game.score_white_player or \
@@ -95,25 +113,32 @@ class InfoPlayerWidget(QWidget):
             self.turn_label.show()
             return
 
+        # refresh the turn label
         if self.player == logic.PlayerTurn.RED and v_game.turn == logic.PlayerTurn.RED or \
                 self.player == logic.PlayerTurn.WHITE and v_game.turn == logic.PlayerTurn.WHITE:
             self.turn_label.show()
 
 
+# This is the widget that displays the game board.
 class GameBoardWidget(QFrame):
     def __init__(self, parent=None):
         super().__init__(parent)
 
+        # init the logic of the game
         self.game = logic.Game(8, 8)
 
+        # init some constants
         self.BOARD_SIZE = 0
         self.CELL_SIZE = 0
 
+        # set the minimum size of the board
         self.setMinimumSize(600, 600)
 
+        # init the sprite sheet that contains the resources
         self.sprite_sheet = QImage(696, 154, QImage.Format_ARGB32_Premultiplied)
         self.sprite_sheet.load("./res/sprite_sheet.png")
 
+    # This function return the targeted area where a pawn will be drawn.
     def get_targeted_rect(self, x, y):
         factor = 154 / 174
         scaled_w = self.CELL_SIZE * 0.7
@@ -122,9 +147,13 @@ class GameBoardWidget(QFrame):
         y = y + self.CELL_SIZE / 2 - scaled_h / 2
         return QRectF(x, y, scaled_w, scaled_h)
 
-    def draw_board(self):
+    # This function draws the current state of the game board.
+    def paintEvent(self, event):
+
+        # init the painter
         painter = QPainter(self)
 
+        # draw the game board by iterating the matrix
         for i in range(8):
             for j in range(8):
                 x = j * self.CELL_SIZE
@@ -143,11 +172,13 @@ class GameBoardWidget(QFrame):
                 elif self.game.Cells[i][j] == logic.CellState.WHITE_KING:
                     painter.drawImage(target, self.sprite_sheet, QRectF(522, 0, 174, 154))
 
+        # draw the borders of the game board
         pen = QPen(Qt.black, 6, Qt.SolidLine, Qt.FlatCap, Qt.MiterJoin)
         painter.setPen(pen)
         borders = QRect(0, 0, self.BOARD_SIZE, self.BOARD_SIZE)
         painter.drawRect(borders)
 
+        # draw the selected pawn
         if self.game.Selected:
             row = self.game.SelectedPawn.get("y")
             col = self.game.SelectedPawn.get("x")
@@ -158,6 +189,7 @@ class GameBoardWidget(QFrame):
             borders.setRect(x, y, self.CELL_SIZE, self.CELL_SIZE)
             painter.drawRect(borders)
 
+            # draw the pieces that represents the possible moves
             for coordinates in self.game.PossibleMoves:
                 target = self.get_targeted_rect(coordinates[0] * self.CELL_SIZE, coordinates[1] * self.CELL_SIZE)
                 if self.game.Cells[row][col] == logic.CellState.RED_MAN:
@@ -169,9 +201,7 @@ class GameBoardWidget(QFrame):
                 elif self.game.Cells[row][col] == logic.CellState.WHITE_KING:
                     painter.drawImage(target, self.sprite_sheet, QRectF(522, 154, 174, 154))
 
-    def paintEvent(self, event):
-        self.draw_board()
-
+    # This function is called when a resize event occur.
     def resizeEvent(self, event):
         size = 0
         if self.width() <= self.height():
@@ -183,6 +213,8 @@ class GameBoardWidget(QFrame):
         self.BOARD_SIZE = size
         self.CELL_SIZE = size / 8
 
+    # This Function is called when a click event occur. If the click is valid, updates the game logic,
+    # redraws the game board and refresh the UI.
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
             col = int(event.x() / self.CELL_SIZE)
@@ -193,26 +225,32 @@ class GameBoardWidget(QFrame):
                                       self.game.GameOver)
 
 
+# This class initializes the main widget divided into 3 widgets : the game board and the players's information.
 class MainWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
+        # init the game vars
         self.v_game = VarsGame()
 
+        # init the 3 sub widgets
         self.game_board_widget = GameBoardWidget(self)
         self.red_player_widget = InfoPlayerWidget(self, logic.PlayerTurn.RED)
         self.white_player_widget = InfoPlayerWidget(self, logic.PlayerTurn.WHITE)
         self.white_player_widget.turn_label.hide()
 
+        # init the layout that contains the 2 info player widgets
         panel_layout = QVBoxLayout()
         panel_layout.addWidget(self.red_player_widget)
         panel_layout.addWidget(self.white_player_widget)
 
+        # init the layout of the main widget
         layout = QGridLayout()
         layout.addWidget(self.game_board_widget, 0, 0, 1, 1)
         layout.addLayout(panel_layout, 0, 1, 1, 1, Qt.AlignTop)
         self.setLayout(layout)
 
+    # This function is called for update the UI
     def update_ui(self, turn, score_red_pl, score_white_pl, game_over):
         self.v_game.turn = turn
         self.v_game.score_red_player = score_red_pl
@@ -222,33 +260,41 @@ class MainWidget(QWidget):
         self.white_player_widget.update_ui(self.v_game)
 
 
+# This class initializes the window of the game.
 class Window(QMainWindow):
     def __init__(self):
         super().__init__()
 
+        # set the title of the window
         self.setWindowTitle("Game of Draughts")
 
+        # set the main widget of the window
         self.central_widget = MainWidget(self)
         self.setCentralWidget(self.central_widget)
 
+        # init the menu
         menu = self.menuBar()
         game_menu = menu.addMenu("Game")
 
+        # action for restart the game
         restart_action = QAction(QIcon("./res/restore.png"), "Restart", self)
         restart_action.setShortcut("Ctrl+R")
         game_menu.addAction(restart_action)
         restart_action.triggered.connect(self.restart_game)
 
+        # action for quit the game
         quit_action = QAction(QIcon("./res/exit.png"), "Quit", self)
         quit_action.setShortcut("Ctrl+Q")
         game_menu.addAction(quit_action)
         quit_action.triggered.connect(lambda: self.close())
 
+    # This function restart the game.
     def restart_game(self):
         # TODO
         return
 
 
+# Entry point of the game.
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = Window()
