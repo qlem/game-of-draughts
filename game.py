@@ -7,10 +7,13 @@ import logic
 
 # This class stores the variables of the current game.
 class VarsGame:
-    def __init__(self, turn=logic.PlayerTurn.RED, score_red_player=0, score_white_player=0, game_over=False):
+    def __init__(self, turn=logic.PlayerTurn.RED, score_red_player=0, score_white_player=0, jump_red=0, jump_white=0,
+                 game_over=False):
         self.turn = turn
         self.score_red_player = score_red_player
         self.score_white_player = score_white_player
+        self.jump_red = jump_red
+        self.jump_white = jump_white
         self.game_over = game_over
 
 
@@ -70,9 +73,9 @@ class InfoPlayerWidget(QWidget):
         self.turn_label = QLabel("Your turn")
 
         # apply some styles
-        score_label.setStyleSheet("font-size: 25px")
+        score_label.setStyleSheet("font-size: 25px; font: italic;")
         self.score_value.setStyleSheet("font: bold; font-size: 30px")
-        jumps_label.setStyleSheet("font-size: 25px")
+        jumps_label.setStyleSheet("font-size: 25px; font: italic;")
         self.jumps_value.setStyleSheet("font: bold; font-size: 30px")
         self.turn_label.setStyleSheet("background: blue; color:white; font: bold; font-size: 30px; "
                                       "padding: 5px 10px 5px 10px;")
@@ -81,12 +84,14 @@ class InfoPlayerWidget(QWidget):
         layout = QGridLayout()
         layout.addWidget(piece_indicator, 0, 0, 1, 2)
         layout.addWidget(score_label, 1, 0, 1, 1)
-        layout.addWidget(self.score_value, 1, 1, 1, 1)
+        layout.addWidget(self.score_value, 1, 1, 1, 1, Qt.AlignRight)
         layout.addWidget(jumps_label, 2, 0, 1, 1)
-        layout.addWidget(self.jumps_value, 2, 1, 1, 1)
+        layout.addWidget(self.jumps_value, 2, 1, 1, 1, Qt.AlignRight)
         layout.addWidget(self.turn_label, 3, 0, 1, 2)
-        layout.setAlignment(Qt.AlignLeft)
+        layout.setAlignment(Qt.AlignLeft | Qt.AlignTop)
         self.setLayout(layout)
+
+        self.setFixedHeight(280)
 
     # This function is called for refresh the UI with the current game vars.
     def update_ui(self, v_game):
@@ -94,10 +99,10 @@ class InfoPlayerWidget(QWidget):
         # refresh the score
         if self.player == logic.PlayerTurn.RED:
             self.score_value.setText(str(v_game.score_red_player))
+            self.jumps_value.setText(str(v_game.jump_red))
         else:
             self.score_value.setText(str(v_game.score_white_player))
-
-        # TODO refresh jumps
+            self.jumps_value.setText(str(v_game.jump_white))
 
         # refresh the winner label
         self.turn_label.hide()
@@ -222,7 +227,7 @@ class GameBoardWidget(QFrame):
             self.game.ValidClick(col, row)
             self.update()
         self.parentWidget().update_ui(self.game.PlayerTurn, self.game.ScoreRed, self.game.ScoreWhite,
-                                      self.game.GameOver)
+                                      self.game.JumpRed, self.game.JumpWhite, self.game.GameOver)
 
 
 # This class initializes the main widget divided into 3 widgets : the game board and the players's information.
@@ -251,10 +256,12 @@ class MainWidget(QWidget):
         self.setLayout(layout)
 
     # This function is called for update the UI
-    def update_ui(self, turn, score_red_pl, score_white_pl, game_over):
+    def update_ui(self, turn, score_red_pl, score_white_pl, jump_red, jump_white, game_over):
         self.v_game.turn = turn
         self.v_game.score_red_player = score_red_pl
         self.v_game.score_white_player = score_white_pl
+        self.v_game.jump_red = jump_red
+        self.v_game.jump_white = jump_white
         self.v_game.game_over = game_over
         self.red_player_widget.update_ui(self.v_game)
         self.white_player_widget.update_ui(self.v_game)
@@ -290,7 +297,9 @@ class Window(QMainWindow):
 
     # This function restart the game.
     def restart_game(self):
-        # TODO
+        self.central_widget.game_board_widget.game = logic.Game(8, 8)
+        self.central_widget.update_ui(logic.PlayerTurn.RED, 0, 0, 0, 0, False)
+        self.central_widget.update()
         return
 
 
