@@ -190,9 +190,9 @@ class GameBoardWidget(QFrame):
 
         # TODO update here
         if self.game.GameOver:
-            if self.game.ScoreBlack > self.game.ScoreWhite:
+            if self.game.ScoreRed > self.game.ScoreWhite:
                 painter.drawText(self.rect(), Qt.AlignCenter, "RED WIN")
-            elif self.game.ScoreWhite > self.game.ScoreBlack:
+            elif self.game.ScoreWhite > self.game.ScoreRed:
                 painter.drawText(self.rect(), Qt.AlignCenter, "WHITE WIN")
             else:
                 painter.drawText(self.rect(), Qt.AlignCenter, "DRAW")
@@ -217,7 +217,7 @@ class GameBoardWidget(QFrame):
             row = int(event.y() / self.CELL_SIZE)
             self.game.ValidClick(col, row)
             self.update()
-        self.parentWidget().update_ui(self.game.PlayerTurn, self.game.ScoreBlack, self.game.ScoreWhite,
+        self.parentWidget().update_ui(self.game.PlayerTurn, self.game.ScoreRed, self.game.ScoreWhite,
                                       self.game.GameOver)
 
 

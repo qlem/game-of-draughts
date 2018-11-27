@@ -29,8 +29,10 @@ class Game:
         self.y = y
         self.Cells = []
         self.PlayerTurn = PlayerTurn.RED
-        self.ScoreBlack = 0
+        self.ScoreRed = 0
         self.ScoreWhite = 0
+        self.JumpRed = 0
+        self.JumpWhite = 0
         self.Selected = False
         self.Capturing = False
         self.SelectedPawn = dict([("x", 0), ("y", 0)])
@@ -93,13 +95,15 @@ class Game:
                 if not self.Capturing:
                     self.PossibleMoves = []
                 # Verifies if the game is over
-                if self.ScoreWhite == 12 or self.ScoreBlack == 12:
+                if self.ScoreWhite == 12 or self.ScoreRed == 12:
                     self.GameOver = True
-                # Verifies if the pawn becomes a king
+                # Verifies if the pawn becomes a king and increments the jump
                 if self.PlayerTurn == PlayerTurn.WHITE:
+                    self.JumpRed += 1
                     if y == self.y - 1:
                         self.Cells[y][x] = CellState.RED_KING
                 elif self.PlayerTurn == PlayerTurn.RED:
+                    self.JumpWhite += 1
                     if y == 0:
                         self.Cells[y][x] = CellState.WHITE_KING
                 return True
@@ -299,7 +303,7 @@ class Game:
                 # Down Left
                 if self.Cells[y - 1][x + 1] == CellState.WHITE_KING or self.Cells[y - 1][x + 1] == CellState.WHITE_MAN:
                     print("Red player ate a White pawn")
-                    self.ScoreBlack += 1
+                    self.ScoreRed += 1
                     self.Cells[y - 1][x + 1] = CellState.EMPTY
                     self.Move(x, y)
                     self.SelectedPawn["y"] = y
@@ -339,7 +343,7 @@ class Game:
                 # Down Right
                 if self.Cells[y - 1][x - 1] == CellState.WHITE_KING or self.Cells[y - 1][x - 1] == CellState.WHITE_MAN:
                     print("Red player ate a White pawn")
-                    self.ScoreBlack += 1
+                    self.ScoreRed += 1
                     self.Cells[y - 1][x - 1] = CellState.EMPTY
                     self.Move(x, y)
                     self.SelectedPawn["y"] = y
@@ -377,7 +381,7 @@ class Game:
                 if (self.Cells[y + 1][x + 1] == CellState.WHITE_KING or self.Cells[y + 1][x + 1] == CellState.WHITE_MAN) \
                         and self.PlayerTurn == PlayerTurn.RED:
                     print("Black player ate a White pawn")
-                    self.ScoreBlack += 1
+                    self.ScoreRed += 1
                     self.Cells[y + 1][x + 1] = CellState.EMPTY
                     self.Move(x, y)
                     self.SelectedPawn["y"] = y
@@ -413,7 +417,7 @@ class Game:
                 if (self.Cells[y - 1][x + 1] == CellState.WHITE_KING or self.Cells[y - 1][x + 1] == CellState.WHITE_MAN) \
                         and self.PlayerTurn == PlayerTurn.RED:
                     print("Black player ate a White pawn")
-                    self.ScoreBlack += 1
+                    self.ScoreRed += 1
                     self.Cells[y - 1][x + 1] = CellState.EMPTY
                     self.Move(x, y)
                     self.SelectedPawn["y"] = y
@@ -449,7 +453,7 @@ class Game:
                 if (self.Cells[y + 1][x - 1] == CellState.WHITE_KING or self.Cells[y + 1][x - 1] == CellState.WHITE_MAN) \
                         and self.PlayerTurn == PlayerTurn.RED:
                     print("Black player ate a White pawn")
-                    self.ScoreBlack += 1
+                    self.ScoreRed += 1
                     self.Cells[y + 1][x - 1] = CellState.EMPTY
                     self.Move(x, y)
                     self.SelectedPawn["y"] = y
@@ -485,7 +489,7 @@ class Game:
                 if (self.Cells[y - 1][x - 1] == CellState.WHITE_KING or self.Cells[y - 1][x - 1] == CellState.WHITE_MAN) \
                         and self.PlayerTurn == PlayerTurn.RED:
                     print("Black player ate a White pawn")
-                    self.ScoreBlack += 1
+                    self.ScoreRed += 1
                     self.Cells[y - 1][x - 1] = CellState.EMPTY
                     self.Move(x, y)
                     self.SelectedPawn["y"] = y
