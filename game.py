@@ -189,7 +189,7 @@ class GameBoardWidget(QFrame):
             row = int(event.y() / self.CELL_SIZE)
             self.game.ValidClick(col, row)
             self.update()
-        self.parentWidget().update_ui(self.game.PlayerTurn, self.game.ScoreBlack, self.game.ScoreWhite,
+        self.parentWidget().update_ui(self.game.PlayerTurn, self.game.ScoreRed, self.game.ScoreWhite,
                                       self.game.GameOver)
 
 
