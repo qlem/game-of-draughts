@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, QWidget, QLabel, QGridLayout, QFrame
+from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, QWidget, QLabel, QGridLayout, QFrame, QVBoxLayout
 from PyQt5.QtGui import QIcon, QImage, QPainter, QPen
 from PyQt5.QtCore import Qt, QRect, QRectF
 import sys
@@ -65,8 +65,9 @@ class RedPlayerWidget(QWidget):
         layout.addWidget(jumps_label, 2, 0, 1, 1)
         layout.addWidget(self.jumps_value, 2, 1, 1, 1)
         layout.addWidget(self.turn_label, 3, 0, 1, 2)
-        layout.setAlignment(Qt.AlignLeft)
         self.setLayout(layout)
+
+        self.setFixedWidth(self.minimumSizeHint().width())
 
     def update_ui(self, v_game):
         self.score_value.setText(str(v_game.score_red_player))
@@ -100,8 +101,9 @@ class WhitePlayerWidget(QWidget):
         layout.addWidget(jumps_label, 2, 0, 1, 1)
         layout.addWidget(self.jumps_value, 2, 1, 1, 1)
         layout.addWidget(self.turn_label, 3, 0, 1, 2)
-        layout.setAlignment(Qt.AlignLeft)
         self.setLayout(layout)
+
+        self.setFixedWidth(self.minimumSizeHint().width())
 
     def update_ui(self, v_game):
         self.score_value.setText(str(v_game.score_white_player))
@@ -229,10 +231,13 @@ class MainWidget(QWidget):
         self.red_player_widget = RedPlayerWidget(self)
         self.white_player_widget = WhitePlayerWidget(self)
 
+        panel_layout = QVBoxLayout()
+        panel_layout.addWidget(self.red_player_widget)
+        panel_layout.addWidget(self.white_player_widget)
+
         layout = QGridLayout()
-        layout.addWidget(self.game_board_widget, 0, 0, 2, 1)
-        layout.addWidget(self.red_player_widget, 0, 1, 1, 1, Qt.AlignTop)
-        layout.addWidget(self.white_player_widget, 1, 1, 1, 1, Qt.AlignTop)
+        layout.addWidget(self.game_board_widget, 0, 0, 1, 1)
+        layout.addLayout(panel_layout, 0, 1, 1, 1, Qt.AlignTop)
         self.setLayout(layout)
 
     def update_ui(self, turn, score_red_pl, score_white_pl, game_over):
