@@ -17,7 +17,7 @@ class VarsGame:
         self.game_over = game_over
 
 
-# This class defines a simple widget that displays the pawn's picture that represents the player.
+# This class defines a simple widget that displays the piece's picture that represents the player.
 class PieceIndicator(QFrame):
     def __init__(self, parent=None, player=logic.PlayerTurn.RED):
         super().__init__(parent)
@@ -32,7 +32,7 @@ class PieceIndicator(QFrame):
         self.sprite_sheet = QImage(696, 154, QImage.Format_ARGB32_Premultiplied)
         self.sprite_sheet.load("./res/sprite_sheet.png")
 
-    # This function return the targeted area where the pawn will be drawn.
+    # This function return the targeted area where the piece will be drawn.
     @staticmethod
     def get_targeted_rect(x, y):
         factor = 154 / 174
@@ -42,7 +42,7 @@ class PieceIndicator(QFrame):
         y = y + 50 - scaled_h / 2
         return QRectF(x, y, scaled_w, scaled_h)
 
-    # This function is called for draw the widget (a pawn and borders).
+    # This function is called for draw the widget (a piece and borders).
     def paintEvent(self, event):
         painter = QPainter(self)
         target = self.get_targeted_rect(0, 0)
@@ -91,12 +91,10 @@ class InfoPlayerWidget(QWidget):
         layout.setAlignment(Qt.AlignLeft | Qt.AlignTop)
         self.setLayout(layout)
 
-        self.setFixedHeight(280)
-
-    # This function is called for refresh the UI with the current game vars.
+    # This function is called for refresh the UI according to the passed game variables.
     def update_ui(self, v_game):
 
-        # refresh the score
+        # refresh the score and jumps values
         if self.player == logic.PlayerTurn.RED:
             self.score_value.setText(str(v_game.score_red_player))
             self.jumps_value.setText(str(v_game.jump_red))
@@ -143,7 +141,7 @@ class GameBoardWidget(QFrame):
         self.sprite_sheet = QImage(696, 154, QImage.Format_ARGB32_Premultiplied)
         self.sprite_sheet.load("./res/sprite_sheet.png")
 
-    # This function return the targeted area where a pawn will be drawn.
+    # This function return the targeted area where a piece will be drawn.
     def get_targeted_rect(self, x, y):
         factor = 154 / 174
         scaled_w = self.CELL_SIZE * 0.7
@@ -183,7 +181,7 @@ class GameBoardWidget(QFrame):
         borders = QRect(0, 0, self.BOARD_SIZE, self.BOARD_SIZE)
         painter.drawRect(borders)
 
-        # draw the selected pawn
+        # draw the highlighting for the selected piece
         if self.game.Selected:
             row = self.game.SelectedPawn.get("y")
             col = self.game.SelectedPawn.get("x")
@@ -230,7 +228,8 @@ class GameBoardWidget(QFrame):
                                       self.game.JumpRed, self.game.JumpWhite, self.game.GameOver)
 
 
-# This class initializes the main widget divided into 3 widgets : the game board and the players's information.
+# This class initializes the main widget divided into 3 widgets : the game board widget and
+# the two widgets that provides information about each player.
 class MainWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -255,7 +254,7 @@ class MainWidget(QWidget):
         layout.addLayout(panel_layout, 0, 1, 1, 1, Qt.AlignTop)
         self.setLayout(layout)
 
-    # This function is called for update the UI
+    # This function is called for update the players widgets.
     def update_ui(self, turn, score_red_pl, score_white_pl, jump_red, jump_white, game_over):
         self.v_game.turn = turn
         self.v_game.score_red_player = score_red_pl
