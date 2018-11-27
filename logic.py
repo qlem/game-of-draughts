@@ -241,15 +241,20 @@ class Game:
         elif self.Cells[self.SelectedPawn["y"]][self.SelectedPawn["x"]] == CellState.RED_MAN or \
                 self.Cells[self.SelectedPawn["y"]][self.SelectedPawn["x"]] == CellState.WHITE_MAN:
             self.GetManMoves()
+        # Extra feature : if a pawn can capture he has to do it
+        if self.CanCapture():
+            for x, y in self.PossibleMoves:
+                if abs(x - self.SelectedPawn["x"]) != 2 or abs(y - self.SelectedPawn["y"]) != 2:
+                    self.PossibleMoves.remove((x, y))
         self.PrintPossibleMoves()
 
     """
-    Method which defines if a pawn can still capture after a move
+    Method which defines if the selected pawn can capture
     """
     def CanCapture(self):
         for x, y in self.PossibleMoves:
             if abs(x - self.SelectedPawn["x"]) == 2 and abs(y - self.SelectedPawn["y"]) == 2:
-                print("Pawn can still capture")
+                print("Pawn can capture")
                 return True
         return False
 
