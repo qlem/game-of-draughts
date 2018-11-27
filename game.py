@@ -2,7 +2,6 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, QWidget, QLabel,
 from PyQt5.QtGui import QIcon, QImage, QPainter, QPen
 from PyQt5.QtCore import Qt, QRect, QRectF
 import sys
-import os
 import logic
 
 
@@ -47,52 +46,25 @@ class PieceIndicator(QFrame):
         painter.drawRect(borders)
 
 
-class RedPlayerWidget(QWidget):
-    def __init__(self, parent=None):
+class InfoPlayerWidget(QWidget):
+    def __init__(self, parent=None, player=logic.PlayerTurn.RED):
         super().__init__(parent)
 
-        piece_indicator = PieceIndicator(self, logic.PlayerTurn.RED)
-        score_label = QLabel("score:")
+        self.player = player
+
+        piece_indicator = PieceIndicator(self, self.player)
+        score_label = QLabel("score")
         self.score_value = QLabel("0")
-        jumps_label = QLabel("jumps:")
+        jumps_label = QLabel("jumps")
         self.jumps_value = QLabel("0")
         self.turn_label = QLabel("Your turn")
 
-        layout = QGridLayout()
-        layout.addWidget(piece_indicator, 0, 0, 1, 2)
-        layout.addWidget(score_label, 1, 0, 1, 1)
-        layout.addWidget(self.score_value, 1, 1, 1, 1)
-        layout.addWidget(jumps_label, 2, 0, 1, 1)
-        layout.addWidget(self.jumps_value, 2, 1, 1, 1)
-        layout.addWidget(self.turn_label, 3, 0, 1, 2)
-        self.setLayout(layout)
-
-        self.setFixedWidth(self.minimumSizeHint().width())
-
-    def update_ui(self, v_game):
-        self.score_value.setText(str(v_game.score_red_player))
-        if v_game.game_over:
-            if v_game.score_red_player > v_game.score_white_player:
-                self.turn_label.setText("Winner")
-            else:
-                self.turn_label.setText("")
-            return
-        if v_game.turn == logic.PlayerTurn.RED:
-            self.turn_label.setText("Your turn")
-        else:
-            self.turn_label.setText("")
-
-
-class WhitePlayerWidget(QWidget):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-
-        piece_indicator = PieceIndicator(self, logic.PlayerTurn.WHITE)
-        score_label = QLabel("score:")
-        self.score_value = QLabel("0")
-        jumps_label = QLabel("jumps:")
-        self.jumps_value = QLabel("0")
-        self.turn_label = QLabel()
+        score_label.setStyleSheet("font-size: 25px")
+        self.score_value.setStyleSheet("font: bold; font-size: 30px")
+        jumps_label.setStyleSheet("font-size: 25px")
+        self.jumps_value.setStyleSheet("font: bold; font-size: 30px")
+        self.turn_label.setStyleSheet("background: blue; color:white; font: bold; font-size: 30px; "
+                                      "padding: 5px 10px 5px 10px;")
 
         layout = QGridLayout()
         layout.addWidget(piece_indicator, 0, 0, 1, 2)
@@ -101,22 +73,31 @@ class WhitePlayerWidget(QWidget):
         layout.addWidget(jumps_label, 2, 0, 1, 1)
         layout.addWidget(self.jumps_value, 2, 1, 1, 1)
         layout.addWidget(self.turn_label, 3, 0, 1, 2)
+        layout.setAlignment(Qt.AlignLeft)
         self.setLayout(layout)
 
-        self.setFixedWidth(self.minimumSizeHint().width())
-
     def update_ui(self, v_game):
-        self.score_value.setText(str(v_game.score_white_player))
-        if v_game.game_over:
-            if v_game.score_white_player > v_game.score_red_player:
-                self.turn_label.setText("Winner")
-            else:
-                self.turn_label.setText("")
-            return
-        if v_game.turn == logic.PlayerTurn.WHITE:
-            self.turn_label.setText("Your turn")
+        if self.player == logic.PlayerTurn.RED:
+            self.score_value.setText(str(v_game.score_red_player))
         else:
-            self.turn_label.setText("")
+            self.score_value.setText(str(v_game.score_white_player))
+
+        self.turn_label.hide()
+        if v_game.game_over and self.player == logic.PlayerTurn.RED and \
+                v_game.score_red_player > v_game.score_white_player or \
+                v_game.game_over and self.player == logic.PlayerTurn.WHITE and \
+                v_game.score_white_player > v_game.score_red_player:
+            self.turn_label.setText("Winner")
+            self.turn_label.show()
+            return
+        elif v_game.game_over and v_game.score_red_player == v_game.score_white_player:
+            self.turn_label.setText("Draw")
+            self.turn_label.show()
+            return
+
+        if self.player == logic.PlayerTurn.RED and v_game.turn == logic.PlayerTurn.RED or \
+                self.player == logic.PlayerTurn.WHITE and v_game.turn == logic.PlayerTurn.WHITE:
+            self.turn_label.show()
 
 
 class GameBoardWidget(QFrame):
@@ -188,15 +169,6 @@ class GameBoardWidget(QFrame):
                 elif self.game.Cells[row][col] == logic.CellState.WHITE_KING:
                     painter.drawImage(target, self.sprite_sheet, QRectF(522, 154, 174, 154))
 
-        # TODO update here
-        if self.game.GameOver:
-            if self.game.ScoreBlack > self.game.ScoreWhite:
-                painter.drawText(self.rect(), Qt.AlignCenter, "RED WIN")
-            elif self.game.ScoreWhite > self.game.ScoreBlack:
-                painter.drawText(self.rect(), Qt.AlignCenter, "WHITE WIN")
-            else:
-                painter.drawText(self.rect(), Qt.AlignCenter, "DRAW")
-
     def paintEvent(self, event):
         self.draw_board()
 
@@ -228,8 +200,9 @@ class MainWidget(QWidget):
         self.v_game = VarsGame()
 
         self.game_board_widget = GameBoardWidget(self)
-        self.red_player_widget = RedPlayerWidget(self)
-        self.white_player_widget = WhitePlayerWidget(self)
+        self.red_player_widget = InfoPlayerWidget(self, logic.PlayerTurn.RED)
+        self.white_player_widget = InfoPlayerWidget(self, logic.PlayerTurn.WHITE)
+        self.white_player_widget.turn_label.hide()
 
         panel_layout = QVBoxLayout()
         panel_layout.addWidget(self.red_player_widget)
@@ -257,7 +230,6 @@ class Window(QMainWindow):
 
         self.central_widget = MainWidget(self)
         self.setCentralWidget(self.central_widget)
-        # self.central_widget.show()
 
         menu = self.menuBar()
         game_menu = menu.addMenu("Game")
