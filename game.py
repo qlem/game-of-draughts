@@ -1,4 +1,5 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, QWidget, QLabel, QGridLayout, QFrame, QVBoxLayout
+from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, QWidget, QLabel, QGridLayout, QFrame, QVBoxLayout, \
+    QHBoxLayout
 from PyQt5.QtGui import QIcon, QImage, QPainter, QPen
 from PyQt5.QtCore import Qt, QRect, QRectF
 import sys
@@ -42,7 +43,7 @@ class PieceIndicator(QFrame):
         y = y + 50 - scaled_h / 2
         return QRectF(x, y, scaled_w, scaled_h)
 
-    # This function is called for draw the widget (a piece and borders).
+    # This function is called for draw the widget.
     def paintEvent(self, event):
         painter = QPainter(self)
         target = self.get_targeted_rect(0, 0)
@@ -88,8 +89,10 @@ class InfoPlayerWidget(QWidget):
         layout.addWidget(jumps_label, 2, 0, 1, 1)
         layout.addWidget(self.jumps_value, 2, 1, 1, 1, Qt.AlignRight)
         layout.addWidget(self.turn_label, 3, 0, 1, 2)
-        layout.setAlignment(Qt.AlignLeft | Qt.AlignTop)
+        layout.setAlignment(Qt.AlignTop)
         self.setLayout(layout)
+
+        self.setFixedHeight(280)
 
     # This function is called for refresh the UI according to the passed game variables.
     def update_ui(self, v_game):
@@ -228,8 +231,8 @@ class GameBoardWidget(QFrame):
                                       self.game.JumpRed, self.game.JumpWhite, self.game.GameOver)
 
 
-# This class initializes the main widget divided into 3 widgets : the game board widget and
-# the two widgets that provides information about each player.
+# This class initializes the main widget divided into 2 sub widgets : the game board widget and
+# the panel widget that provides information about each player.
 class MainWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -237,21 +240,24 @@ class MainWidget(QWidget):
         # init the game vars
         self.v_game = VarsGame()
 
-        # init the 3 sub widgets
+        # init the sub widgets
         self.game_board_widget = GameBoardWidget(self)
         self.red_player_widget = InfoPlayerWidget(self, logic.PlayerTurn.RED)
         self.white_player_widget = InfoPlayerWidget(self, logic.PlayerTurn.WHITE)
         self.white_player_widget.turn_label.hide()
 
-        # init the layout that contains the 2 info player widgets
+        # init the widget that contains the 2 info player widgets
+        panel_widget = QWidget()
         panel_layout = QVBoxLayout()
         panel_layout.addWidget(self.red_player_widget)
         panel_layout.addWidget(self.white_player_widget)
+        panel_layout.setAlignment(Qt.AlignTop | Qt.AlignLeft)
+        panel_widget.setLayout(panel_layout)
 
         # init the layout of the main widget
-        layout = QGridLayout()
-        layout.addWidget(self.game_board_widget, 0, 0, 1, 1)
-        layout.addLayout(panel_layout, 0, 1, 1, 1, Qt.AlignTop)
+        layout = QHBoxLayout()
+        layout.addWidget(self.game_board_widget)
+        layout.addWidget(panel_widget)
         self.setLayout(layout)
 
     # This function is called for update the players widgets.
