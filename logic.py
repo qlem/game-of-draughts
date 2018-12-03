@@ -25,20 +25,31 @@ Initialize the game class and call ValidClick(x,y)
 """
 class Game:
     def __init__(self, x, y):
+        # x and y are the size of our board
         self.x = x
         self.y = y
+        # Represents the board cells
         self.Cells = []
+        # Sets the actual turn
         self.PlayerTurn = PlayerTurn.RED
+        # Scores
         self.ScoreRed = 0
         self.ScoreWhite = 0
+        # How many jumps each player performed
         self.JumpRed = 0
         self.JumpWhite = 0
+        # Defines if a pawn is currently selected
         self.Selected = False
+        # Defines if a pawn is capturing
         self.Capturing = False
+        # Defines the positions of the selected pawn
         self.SelectedPawn = dict([("x", 0), ("y", 0)])
+        # Contains the positions a player can play
         self.PossibleMoves = []
+        # Sets the end of the game
         self.GameOver = False
 
+        # Calls the function which initializes the board
         self.InitializeBoard()
 
     """
@@ -91,7 +102,6 @@ class Game:
             # Verifies if the second click is doable and performs it
             if self.PerformMove(x, y):
                 # Cleans possible moves
-                print("cleans moves")
                 if not self.Capturing:
                     self.PossibleMoves = []
                 # Verifies if the game is over
@@ -247,9 +257,15 @@ class Game:
             self.GetManMoves()
         # Extra feature : if a pawn can capture he has to do it
         if self.CanCapture():
+            # Creates a new list
+            NewMoves = []
+            self.PrintPossibleMoves()
+            print("selected : " + str(self.SelectedPawn["x"]) + " " + str(self.SelectedPawn["y"]))
             for x, y in self.PossibleMoves:
-                if abs(x - self.SelectedPawn["x"]) != 2 or abs(y - self.SelectedPawn["y"]) != 2:
-                    self.PossibleMoves.remove((x, y))
+                if abs(x - self.SelectedPawn["x"]) == 2 or abs(y - self.SelectedPawn["y"]) == 2:
+                    # Adds the capture position to the new position list
+                    NewMoves.append((x, y))
+            self.PossibleMoves = NewMoves
         self.PrintPossibleMoves()
 
     """
@@ -554,6 +570,9 @@ class Game:
                     print(4, end='')
             print("\n", end='')
 
+    """
+    DEBUG Method : prints the possible moves
+    """
     def PrintPossibleMoves(self):
         for x in self.PossibleMoves:
             print(x)
