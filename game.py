@@ -120,6 +120,7 @@ class InfoPlayerWidget(QWidget):
             return
 
         # refresh the turn label
+        self.turn_label = QLabel("Your turn")
         if self.player == logic.PlayerTurn.RED and v_game.turn == logic.PlayerTurn.RED or \
                 self.player == logic.PlayerTurn.WHITE and v_game.turn == logic.PlayerTurn.WHITE:
             self.turn_label.show()
