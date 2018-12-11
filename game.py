@@ -113,9 +113,11 @@ class InfoPlayerWidget(QWidget):
                 v_game.score_white_player > v_game.score_red_player:
             self.turn_label.setText("Winner")
             self.turn_label.show()
+            return
         elif v_game.game_over and v_game.score_red_player == v_game.score_white_player:
             self.turn_label.setText("Draw")
             self.turn_label.show()
+            return
         elif v_game.game_over:
             return
 
