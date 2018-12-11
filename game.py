@@ -120,7 +120,7 @@ class InfoPlayerWidget(QWidget):
             return
 
         # refresh the turn label
-        self.turn_label = QLabel("Your turn")
+        self.turn_label.setText("Your turn")
         if self.player == logic.PlayerTurn.RED and v_game.turn == logic.PlayerTurn.RED or \
                 self.player == logic.PlayerTurn.WHITE and v_game.turn == logic.PlayerTurn.WHITE:
             self.turn_label.show()
@@ -226,10 +226,10 @@ class GameBoardWidget(QFrame):
         if event.button() == Qt.LeftButton:
             col = int(event.x() / self.CELL_SIZE)
             row = int(event.y() / self.CELL_SIZE)
-            self.game.ValidClick(col, row)
-            self.update()
-        self.parentWidget().update_ui(self.game.PlayerTurn, self.game.ScoreRed, self.game.ScoreWhite,
-                                      self.game.JumpRed, self.game.JumpWhite, self.game.GameOver)
+            if self.game.ValidClick(col, row):
+                self.update()
+                self.parentWidget().update_ui(self.game.PlayerTurn, self.game.ScoreRed, self.game.ScoreWhite,
+                                              self.game.JumpRed, self.game.JumpWhite, self.game.GameOver)
 
 
 # This class initializes the main widget divided into 2 sub widgets : the game board widget and
