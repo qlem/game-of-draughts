@@ -74,11 +74,11 @@ class InfoPlayerWidget(QWidget):
         self.turn_label = QLabel("Your turn")
 
         # apply some styles
-        score_label.setStyleSheet("font-size: 25px;")
-        self.score_value.setStyleSheet("font-size: 25px")
-        jumps_label.setStyleSheet("font-size: 25px;")
-        self.jumps_value.setStyleSheet("font-size: 25px")
-        self.turn_label.setStyleSheet("background: blue; color:white; font: bold; font-size: 30px; "
+        score_label.setStyleSheet("font-size: 18px;")
+        self.score_value.setStyleSheet("font-size: 18px")
+        jumps_label.setStyleSheet("font-size: 18px;")
+        self.jumps_value.setStyleSheet("font-size: 18px")
+        self.turn_label.setStyleSheet("background: blue; color:white; font: bold; font-size: 22px; "
                                       "padding: 5px 10px 5px 10px;")
 
         # init the layout
