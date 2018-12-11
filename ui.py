@@ -27,7 +27,7 @@ class PieceIndicator(QFrame):
         self.player = player
 
         # init the size of the widget
-        self.setFixedSize(80, 80)
+        self.setFixedSize(140, 80)
 
         # init the sprite sheet that contains the resources
         self.sprite_sheet = QImage(696, 154, QImage.Format_ARGB32_Premultiplied)
@@ -39,7 +39,7 @@ class PieceIndicator(QFrame):
         factor = 154 / 174
         scaled_w = 80 * 0.7
         scaled_h = scaled_w * factor
-        x = x + 40 - scaled_w / 2
+        x = x + 70 - scaled_w / 2
         y = y + 40 - scaled_h / 2
         return QRectF(x, y, scaled_w, scaled_h)
 
@@ -51,9 +51,9 @@ class PieceIndicator(QFrame):
             painter.drawImage(target, self.sprite_sheet, QRectF(0, 0, 174, 154))
         else:
             painter.drawImage(target, self.sprite_sheet, QRectF(348, 0, 174, 154))
-        pen = QPen(Qt.black, 6, Qt.SolidLine, Qt.FlatCap, Qt.MiterJoin)
+        pen = QPen(Qt.black, 4, Qt.SolidLine, Qt.FlatCap, Qt.MiterJoin)
         painter.setPen(pen)
-        borders = QRect(0, 0, 80, 80)
+        borders = QRect(0, 0, 140, 80)
         painter.drawRect(borders)
 
 
@@ -72,14 +72,15 @@ class InfoPlayerWidget(QWidget):
         jumps_label = QLabel("jumps")
         self.jumps_value = QLabel("0")
         self.turn_label = QLabel("Your turn")
+        self.turn_label.setAlignment(Qt.AlignHCenter)
 
         # apply some styles
-        score_label.setStyleSheet("font-size: 18px;")
-        self.score_value.setStyleSheet("font-size: 18px")
-        jumps_label.setStyleSheet("font-size: 18px;")
-        self.jumps_value.setStyleSheet("font-size: 18px")
+        score_label.setStyleSheet("font-size: 18px; font: bold; padding-left: 5px")
+        self.score_value.setStyleSheet("font-size: 18px; font: bold; padding-right: 5px")
+        jumps_label.setStyleSheet("font-size: 18px; font: bold; padding-left: 5px")
+        self.jumps_value.setStyleSheet("font-size: 18px; font: bold; padding-right: 5px")
         self.turn_label.setStyleSheet("background: blue; color:white; font: bold; font-size: 22px; "
-                                      "padding: 5px 10px 5px 10px;")
+                                      "padding-top: 5px; padding-bottom: 5px")
 
         # init the layout
         layout = QGridLayout()
@@ -92,7 +93,7 @@ class InfoPlayerWidget(QWidget):
         layout.setAlignment(Qt.AlignTop)
         self.setLayout(layout)
 
-        self.setFixedHeight(250)
+        self.setFixedHeight(230)
 
     # This function is called for refresh the UI according to the passed game variables.
     def update_ui(self, v_game):
@@ -105,7 +106,7 @@ class InfoPlayerWidget(QWidget):
             self.score_value.setText(str(v_game.score_white_player))
             self.jumps_value.setText(str(v_game.jump_white))
 
-        # refresh the winner label
+        # refresh the turn label
         self.turn_label.hide()
         if v_game.game_over and self.player == logic.PlayerTurn.RED and \
                 v_game.score_red_player > v_game.score_white_player or \
@@ -113,19 +114,14 @@ class InfoPlayerWidget(QWidget):
                 v_game.score_white_player > v_game.score_red_player:
             self.turn_label.setText("Winner")
             self.turn_label.show()
-            return
         elif v_game.game_over and v_game.score_red_player == v_game.score_white_player:
             self.turn_label.setText("Draw")
             self.turn_label.show()
-            return
-        elif v_game.game_over:
-            return
-
-        # refresh the turn label
-        self.turn_label.setText("Your turn")
-        if self.player == logic.PlayerTurn.RED and v_game.turn == logic.PlayerTurn.RED or \
-                self.player == logic.PlayerTurn.WHITE and v_game.turn == logic.PlayerTurn.WHITE:
-            self.turn_label.show()
+        elif not v_game.game_over:
+            self.turn_label.setText("Your turn")
+            if self.player == logic.PlayerTurn.RED and v_game.turn == logic.PlayerTurn.RED or \
+                    self.player == logic.PlayerTurn.WHITE and v_game.turn == logic.PlayerTurn.WHITE:
+                self.turn_label.show()
 
 
 # This is the widget that displays the game board.
@@ -245,22 +241,27 @@ class MainWidget(QWidget):
 
         # init the sub widgets
         self.game_board_widget = GameBoardWidget(self)
+        game_panel_title = QLabel("Game Panel")
+        game_panel_title.setStyleSheet("font-size: 20px; font: bold; margin-bottom: 10px")
         self.red_player_widget = InfoPlayerWidget(self, logic.PlayerTurn.RED)
         self.white_player_widget = InfoPlayerWidget(self, logic.PlayerTurn.WHITE)
         self.white_player_widget.turn_label.hide()
 
-        # init the widget that contains the 2 info player widgets
+        # init the game panel widget that provides some information about the current game
         panel_widget = QWidget()
+        panel_widget.setStyleSheet("background-color: #c4c4c4")
         panel_layout = QVBoxLayout()
+        panel_layout.addWidget(game_panel_title)
         panel_layout.addWidget(self.red_player_widget)
         panel_layout.addWidget(self.white_player_widget)
-        panel_layout.setAlignment(Qt.AlignTop | Qt.AlignLeft)
+        panel_layout.setAlignment(Qt.AlignTop)
         panel_widget.setLayout(panel_layout)
+        panel_widget.setFixedWidth(190)
 
         # init the layout of the main widget
         layout = QHBoxLayout()
+        layout.addWidget(panel_widget, Qt.AlignLeft)
         layout.addWidget(self.game_board_widget)
-        layout.addWidget(panel_widget)
         self.setLayout(layout)
 
     # This function is called for update the players widgets.
