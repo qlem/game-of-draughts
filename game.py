@@ -27,7 +27,7 @@ class PieceIndicator(QFrame):
         self.player = player
 
         # init the size of the widget
-        self.setFixedSize(100, 100)
+        self.setFixedSize(80, 80)
 
         # init the sprite sheet that contains the resources
         self.sprite_sheet = QImage(696, 154, QImage.Format_ARGB32_Premultiplied)
@@ -37,10 +37,10 @@ class PieceIndicator(QFrame):
     @staticmethod
     def get_targeted_rect(x, y):
         factor = 154 / 174
-        scaled_w = 100 * 0.7
+        scaled_w = 80 * 0.7
         scaled_h = scaled_w * factor
-        x = x + 50 - scaled_w / 2
-        y = y + 50 - scaled_h / 2
+        x = x + 40 - scaled_w / 2
+        y = y + 40 - scaled_h / 2
         return QRectF(x, y, scaled_w, scaled_h)
 
     # This function is called for draw the widget.
@@ -53,7 +53,7 @@ class PieceIndicator(QFrame):
             painter.drawImage(target, self.sprite_sheet, QRectF(348, 0, 174, 154))
         pen = QPen(Qt.black, 6, Qt.SolidLine, Qt.FlatCap, Qt.MiterJoin)
         painter.setPen(pen)
-        borders = QRect(0, 0, 100, 100)
+        borders = QRect(0, 0, 80, 80)
         painter.drawRect(borders)
 
 
@@ -92,7 +92,7 @@ class InfoPlayerWidget(QWidget):
         layout.setAlignment(Qt.AlignTop)
         self.setLayout(layout)
 
-        self.setFixedHeight(280)
+        self.setFixedHeight(250)
 
     # This function is called for refresh the UI according to the passed game variables.
     def update_ui(self, v_game):
