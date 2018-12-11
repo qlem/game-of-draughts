@@ -93,7 +93,7 @@ class InfoPlayerWidget(QWidget):
         layout.setAlignment(Qt.AlignTop)
         self.setLayout(layout)
 
-        self.setFixedHeight(230)
+        self.setFixedHeight(220)
 
     # This function is called for refresh the UI according to the passed game variables.
     def update_ui(self, v_game):
