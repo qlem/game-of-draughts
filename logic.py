@@ -574,7 +574,3 @@ class Game:
     def PrintPossibleMoves(self):
         for x in self.PossibleMoves:
             print(x)
-
-
-if __name__ == '__main__':
-    app = Game(8, 8)
